@@ -897,7 +897,7 @@ th.sortable:hover { color: var(--text); background: rgba(255,255,255,0.05) !impo
     border: none;
     border-top: 1px solid var(--border);
     transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-    z-index: 1001;
+    z-index: 9999;
   }
   
   .staff-dropdown::before {
