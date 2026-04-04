@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AttendX — Register Staff Account</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="login.css"/>
+<style>
+  .register-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+  .success-msg { color: var(--green); font-size: 13px; margin-top: 10px; display: none; text-align: center; }
+  .back-link { display: block; text-align: center; margin-top: 20px; font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .back-link:hover { color: var(--accent); }
+  select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: var(--text); outline: none; appearance: none; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="login-container" id="login-box">
+  
+  <div class="brand-panel">
+    <div class="brand-logo">AttendX</div>
+    <div class="brand-title">Join the System.</div>
+    <div class="brand-desc">Create your official staff account to begin managing students and attendance for your assigned class.</div>
+  </div>
+
+  <div class="form-panel">
+    <div class="form-header">
+      <h2>Create Account</h2>
+      <p>Fill in your details to create a staff login.</p>
+    </div>
+
+    <form id="register-form">
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="e.g. staff_new" required autocomplete="off" />
+      </div>
+
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Min 4 characters" required />
+      </div>
+
+      <div class="register-grid">
+        <div class="input-group" style="margin-bottom:0">
+          <label>Assigned Year</label>
+          <select id="assign-year" required>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+          </select>
+        </div>
+        <div class="input-group" style="margin-bottom:0">
+          <label>Assigned Section</label>
+          <select id="assign-section" required>
+            <option value="A">Section A</option>
+            <option value="B">Section B</option>
+            <option value="C">Section C</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="login-btn" id="submit-btn" style="background: var(--accent);">
+        Register Account
+        <div class="spinner"></div>
+      </button>
+
+      <div class="error-msg" id="error-msg"></div>
+      <div class="success-msg" id="success-msg">Account created! Redirecting to login...</div>
+    </form>
+
+    <a href="login.html" class="back-link">← Back to Sign In</a>
+  </div>
+
+</div>
+
+<script src="register.js"></script>
+
+</body>
+</html>

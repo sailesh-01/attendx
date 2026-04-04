@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AttendX — Student Info</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<nav>
+  <span class="nav-logo">AttendX</span>
+  <a class="nav-link" href="attendance.html">📋 Attendance</a>
+  <a class="nav-link active" href="students.html">👥 Students</a>
+  <a class="nav-link" href="marks.html">📊 Marks</a>
+  <a class="nav-link" href="whatsapp.html">💬 WhatsApp</a>
+  <a class="nav-link nav-logout" href="login.html">🚪 Logout</a>
+</nav>
+
+<div class="main">
+  <div class="batch-config-panel">
+    <div>
+      <div class="page-title" style="color:var(--accent)">Batch Settings</div>
+      <div class="page-sub">Configure roll numbers for CURRENT class</div>
+    </div>
+    <div style="display:flex; gap:12px; align-items:flex-end;">
+      <div class="form-group"><label>Prefix</label><input class="form-input f-mono" id="b-prefix" type="text" style="width:50px" maxlength="2"/></div>
+      <div class="form-group"><label>Year</label><input class="form-input f-mono" id="b-year" type="text" style="width:50px" maxlength="2"/></div>
+      <div class="form-group"><label>Dept Code</label><input class="form-input f-mono" id="b-dept" type="text" style="width:50px" maxlength="3"/></div>
+      <div class="form-group"><label>Dept Name</label><input class="form-input" id="b-dept-name" type="text" style="width:140px"/></div>
+      <button class="btn btn-primary" onclick="saveBatchConfig()">Update</button>
+    </div>
+  </div>
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Student Directory</div>
+      <div class="page-sub"><span id="batch-display">ES24AD</span> · <span id="count">0</span> students</div>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+       <div class="form-group" style="flex-direction:row; align-items:center; gap:8px;">
+         <label style="margin:0">Year</label>
+         <select class="sel" id="year-filter" onchange="loadStudents()" style="padding:4px 8px; font-size:12px; height:32px;">
+           <option value="2">2</option><option value="3">3</option><option value="4">4</option>
+         </select>
+       </div>
+       <div class="form-group" style="flex-direction:row; align-items:center; gap:8px;">
+         <label style="margin:0">Sec</label>
+         <select class="sel" id="section-filter" onchange="renderTable()" style="padding:4px 8px; font-size:12px; height:32px;">
+           <option value="ALL">All</option><option value="A">A</option><option value="B">B</option><option value="C">C</option>
+         </select>
+       </div>
+       <button class="btn btn-primary" onclick="openAdd()">＋ Add Student</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search" placeholder="Search name/roll/phone…" oninput="renderTable()"/>
+    </div>
+    <button class="btn btn-ghost" onclick="addColumn()">＋ Column</button>
+    <button class="btn btn-ghost" onclick="document.getElementById('import-csv-file').click()">↑ Import</button>
+    <input type="file" id="import-csv-file" accept=".csv" style="display: none;" onchange="importCSV(event)">
+    <button class="btn btn-ghost" onclick="exportCSV()">↓ Export</button>
+    <button class="btn btn-danger btn-ghost" onclick="deleteAllStudents()">🗑 Clear All</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr id="thead-row">
+          <th class="cb-cell"><input type="checkbox" class="custom-cb" id="select-all" onclick="toggleSelectAll(this)"></th>
+          <th>S.No</th><th>Short</th><th>Roll No</th><th>Name</th>
+          <th>Student Phone</th><th>Parent Phone</th><th>Parent Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Bulk Toolbar -->
+<div class="bulk-toolbar" id="bulk-toolbar">
+  <div class="bulk-count" id="bulk-count">0 Selected</div>
+  <button class="btn btn-danger btn-sm" onclick="deleteSelected()">🗑 Delete Selected</button>
+  <button class="btn btn-ghost btn-sm" onclick="clearSelection()">Cancel</button>
+</div>
+
+<!-- Edit/Add Modal (Redesigned as Profile Card) -->
+<div class="overlay" id="overlay">
+  <div class="modal profile-modal">
+    <div class="profile-header">
+      <div class="profile-avatar-large" id="p-avatar" style="background:var(--accent)">?</div>
+      <div class="profile-title-row">
+        <div class="profile-name" id="p-name-head">New Student</div>
+        <div class="profile-roll" id="p-roll-head">No Roll Number Assigned</div>
+      </div>
+      <button class="modal-x" onclick="closeModal()">✕</button>
+    </div>
+    <div class="profile-body">
+      <div class="profile-stats" id="p-stats-row">
+        <div class="pstat"><span class="pstat-val" id="ps-att">0%</span><span class="pstat-label">Attendance</span></div>
+        <div class="pstat"><span class="pstat-val" id="ps-marks">0.0</span><span class="pstat-label">Avg Marks</span></div>
+      </div>
+      <div class="profile-form-grid" id="modal-form-grid">
+        <div class="form-group"><label>Short Code</label><input class="form-input" id="f-short" type="number"/></div>
+        <div class="form-group"><label>Roll Number</label><input class="form-input f-mono" id="f-roll" type="text"/></div>
+        <div class="form-group full"><label>Full Name</label><input class="form-input" id="f-name" type="text"/></div>
+        <div class="form-group"><label>Student Phone</label><input class="form-input" id="f-phone" type="text"/></div>
+        <div class="form-group"><label>Parent Phone</label><input class="form-input" id="f-parent" type="text"/></div>
+        <div class="form-group"><label>Parent Name</label><input class="form-input" id="f-pname" type="text"/></div>
+        <div class="form-group"><label>Year</label><select class="sel" id="f-year"><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option></select></div>
+        <div class="form-group"><label>Section</label><select class="sel" id="f-section"><option value="A">Class A</option><option value="B">Class B</option><option value="C">Class C</option></select></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveStudent()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><div class="tdot"></div><span id="tmsg"></span></div>
+
+<script src="data.js"></script>
+<script src="students.js"></script>
+</body>
+</html>

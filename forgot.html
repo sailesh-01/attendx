@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AttendX — Reset Password</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="login.css"/>
+<style>
+  .success-msg { color: var(--green); font-size: 13px; margin-top: 10px; display: none; text-align: center; }
+  .back-link { display: block; text-align: center; margin-top: 20px; font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .back-link:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="login-container" id="login-box">
+  
+  <div class="brand-panel">
+    <div class="brand-logo">AttendX</div>
+    <div class="brand-title">Reset Your Access.</div>
+    <div class="brand-desc">Update your credentials to maintain secure access to your student attendance and marks dashboard.</div>
+  </div>
+
+  <div class="form-panel">
+    <div class="form-header">
+      <h2>Change Password</h2>
+      <p>Verify your old password to set a new one.</p>
+    </div>
+
+    <form id="forgot-form">
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="Enter your username" required autocomplete="off" />
+      </div>
+
+      <div class="input-group">
+        <label>Old Password</label>
+        <input type="password" id="old-password" placeholder="••••••••" required />
+        <div class="input-hint" style="margin-top: 5px; font-size: 11px; color: var(--muted);">Required to verify your account identity.</div>
+      </div>
+
+      <div class="input-group">
+        <label>New Password</label>
+        <input type="password" id="new-password" placeholder="Min 4 characters" required />
+        <div class="input-hint" style="margin-top: 5px; font-size: 11px; color: var(--muted);">Enter the password you wish to use from now on.</div>
+      </div>
+
+      <div class="input-group">
+        <label>Confirm New Password</label>
+        <input type="password" id="confirm-password" placeholder="Repeat new password" required />
+      </div>
+
+      <button type="submit" class="login-btn" id="submit-btn" style="background: var(--purple);">
+        Update Password
+        <div class="spinner"></div>
+      </button>
+
+      <div class="error-msg" id="error-msg"></div>
+      <div class="success-msg" id="success-msg">Password updated! Redirecting to login...</div>
+    </form>
+
+    <a href="login.html" class="back-link">← Back to Sign In</a>
+  </div>
+
+</div>
+
+<script src="forgot.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AttendX — Staff Login</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="login.css"/>
+</head>
+<body>
+
+<div class="login-container" id="login-box">
+  
+  <div class="brand-panel">
+    <div class="brand-logo">AttendX</div>
+    <div class="brand-title">Welcome Back Staff.</div>
+    <div class="brand-desc">Log in to manage attendance, distribute marks, and notify parents effortlessly.</div>
+  </div>
+
+  <div class="form-panel" id="form-panel">
+    <div class="form-header">
+      <h2>Sign In</h2>
+      <p>Enter your staff credentials to continue.</p>
+    </div>
+
+    <form id="login-form">
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="ts101" autocomplete="off" />
+      </div>
+
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" />
+      </div>
+
+      <button type="submit" class="login-btn" id="login-btn">
+        Sign In
+        <div class="spinner"></div>
+      </button>
+
+      <div class="footer-links" style="margin-top: 20px; text-align: center; font-size: 13px;">
+        <a href="forgot.html" style="color: var(--muted); text-decoration: none; transition: color 0.15s;">Forgot Password?</a>
+        <span style="color: var(--muted); margin: 0 5px;">|</span>
+        <a href="register.html" style="color: var(--muted); text-decoration: none; transition: color 0.15s;">New User? Register</a>
+      </div>
+
+      <div class="error-msg" id="error-msg">Incorrect username or password.</div>
+    </form>
+  </div>
+
+</div>
+
+<script src="login.js"></script>
+
+</body>
+</html>

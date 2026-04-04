@@ -1,0 +1,241 @@
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.15), transparent 40%),
+                radial-gradient(circle at bottom left, rgba(168, 85, 247, 0.1), transparent 40%),
+                var(--bg);
+    margin: 0;
+    padding: 20px;
+  }
+
+  .login-container {
+    position: relative;
+    width: min(95vw, 850px);
+    height: auto;
+    min-height: clamp(500px, 70vh, 700px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    display: flex;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes slideUpFade {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Left Side: Branding / Slide overlay */
+  .brand-panel {
+    width: 45%;
+    background: linear-gradient(135deg, var(--surface2) 0%, var(--surface) 100%);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+    z-index: 2;
+    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .brand-logo {
+    font-family: var(--mono);
+    font-size: 24px;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    margin-bottom: 20px;
+  }
+
+  .brand-title {
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .brand-desc {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* Right Side: Form */
+  .form-panel {
+    width: 55%;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .form-header {
+    margin-bottom: 30px;
+    opacity: 0;
+    transform: translateX(20px);
+    animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+  }
+  .form-header h2 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+  .form-header p { color: var(--muted); font-size: 13px; }
+
+  .input-group {
+    margin-bottom: 20px;
+    opacity: 0;
+    transform: translateX(20px);
+    animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .input-group:nth-child(1) { animation-delay: 0.4s; }
+  .input-group:nth-child(2) { animation-delay: 0.45s; }
+  .input-group:nth-child(3) { animation-delay: 0.5s; }
+  .input-group:nth-child(4) { animation-delay: 0.55s; }
+  .input-group:nth-child(5) { animation-delay: 0.6s; }
+
+  .login-btn-container { animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.65s forwards; opacity: 0; }
+  /* We'll wrap the button in a container for the animation if needed, or just update the button selector */
+  .login-btn {
+    animation-delay: 0.65s !important;
+  }
+
+  .input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .input-group input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    font-family: var(--sans);
+    transition: all 0.2s;
+  }
+  .input-group input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+
+  .login-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--sans);
+    opacity: 0;
+    transform: translateX(20px);
+    animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+    position: relative;
+    overflow: hidden;
+  }
+  .login-btn:hover { background: #2563eb; transform: translateY(-1px); }
+  .login-btn:active { transform: translateY(1px); }
+
+  .error-msg {
+    color: var(--red);
+    font-size: 12px;
+    margin-top: 10px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.2s;
+    text-align: center;
+  }
+
+  @keyframes slideInRight {
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Success Animation specific */
+  .container-success .brand-panel {
+    transform: translateX(125%);
+    border-right: none;
+    border-left: 1px solid var(--border);
+  }
+  .container-success .form-panel {
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .spinner {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px; height: 40px;
+    border: 3px solid rgba(255,255,255,0.1);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    opacity: 0;
+    pointer-events: none;
+  }
+  @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+  .btn-loading { color: transparent !important; }
+  .btn-loading .spinner { opacity: 1; width: 20px; height: 20px; border-width: 2px; }
+
+  /* Mobile Responsiveness */
+  @media (max-width: 768px) {
+    body {
+      padding: 16px;
+      overflow-y: auto;
+      height: auto;
+    }
+    .login-container {
+      flex-direction: column;
+      height: auto;
+      min-height: unset;
+    }
+    .brand-panel {
+      width: 100%;
+      padding: 40px 30px;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    .brand-logo {
+      margin-bottom: 10px;
+    }
+    .brand-title {
+      font-size: 26px;
+    }
+    .form-panel {
+      width: 100%;
+      padding: 40px 30px;
+    }
+    .form-header {
+      text-align: center;
+    }
+    .container-success .brand-panel {
+      transform: translateY(100%);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .brand-panel, .form-panel {
+      padding: 30px 20px;
+    }
+    .brand-title {
+      font-size: 22px;
+    }
+  }
