@@ -254,7 +254,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div class="dropdown-item" id="btn-ch-pass">
                             <span>🔑</span> Change Password
                         </div>
-                        <a href="login.html" class="dropdown-item logout-item">
+                        <a href="index.html" class="dropdown-item logout-item">
                             <span>🚪</span> Logout
                         </a>
                     </div>
@@ -424,7 +424,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (res.ok) {
                         alert("Password successfully updated. Please login again.");
                         localStorage.clear();
-                        window.location.href = 'login.html';
+                        window.location.href = 'index.html';
                     } else {
                         errEl.textContent = result.error || "Update failed.";
                         errEl.style.display = 'block';

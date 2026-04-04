@@ -42,7 +42,7 @@ document.getElementById('register-form').addEventListener('submit', async functi
       
       // Redirect back to login after short delay
       setTimeout(() => {
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
       }, 2000);
     } else {
       // Error from server
