@@ -572,16 +572,35 @@ function openModal(){
 
 function closeModal(){document.getElementById("overlay").classList.remove("show");}
 
+function getMarksMessage(s, exam, stMarks, subjList, total, avgPct, gr) {
+    const savedTmpls = JSON.parse(localStorage.getItem("attendx_templates") || "{}");
+    let tmpl = savedTmpls["marks"];
+    let markSummary = subjList.map(subj => `${subj}: ${stMarks[subj]}/${getMax()}`).join(", ");
+    
+    if (!tmpl) {
+        return `Dear Parent,\n\nYour ward *${s.name}* (${rollNo(s.short_code)}) has scored the following in *${exam}*:\n${markSummary}\nTotal: ${total}/${subjList.length * getMax()} (${avgPct}%) — Grade: *${gr.g}*\n\nRegards,\n${BATCH.deptName} Department`;
+    }
+
+    return tmpl
+        .replace(/{{name}}/g, s.name)
+        .replace(/{{roll_no}}/g, rollNo(s.short_code))
+        .replace(/{{date}}/g, new Date().toLocaleDateString("en-IN"))
+        .replace(/{{subject}}/g, exam)
+        .replace(/{{marks}}/g, total)
+        .replace(/{{max_marks}}/g, subjList.length * getMax())
+        .replace(/{{grade}}/g, gr.g)
+        .replace(/{{department}}/g, BATCH.deptName);
+}
+
 function sendSingle(short) {
     const s = window.students.find(st => st.short_code == short);
     const exam = document.getElementById("exam-type").value;
     const stMarks = marksData[short];
     const subjList = Object.keys(stMarks).filter(subj => activeSubjects.includes(subj));
-    let markSummary = subjList.map(subj => `${subj}: ${stMarks[subj]}/${getMax()}`).join(", ");
     const total = subjList.reduce((sum, subj) => sum + stMarks[subj], 0);
     const avgPct = Math.round((total / (subjList.length * getMax())) * 100);
     const gr = getGrade(avgPct);
-    const msg = `Dear Parent,\n\nYour ward *${s.name}* (${rollNo(s.short_code)}) has scored the following in *${exam}*:\n${markSummary}\nTotal: ${total}/${subjList.length*getMax()} (${avgPct}%) — Grade: *${gr.g}*\n\nRegards,\n${BATCH.deptName} Department`;
+    const msg = getMarksMessage(s, exam, stMarks, subjList, total, avgPct, gr);
     window.open(`https://wa.me/${s.parent_phone}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
@@ -646,7 +665,7 @@ async function sendAll(){
     const total = subjList.reduce((sum, subj) => sum + stMarks[subj], 0);
     const avgPct = Math.round((total / (subjList.length * getMax())) * 100);
     const gr = getGrade(avgPct);
-    const msg = `Dear Parent,\n\nYour ward *${s.name}* (${rollNo(s.short_code)}) has scored the following in *${exam}*:\n${markSummary}\nTotal: ${total}/${subjList.length*getMax()} (${avgPct}%) — Grade: *${gr.g}*\n\nRegards,\n${BATCH.deptName} Department`;
+    const msg = getMarksMessage(s, exam, stMarks, subjList, total, avgPct, gr);
     
     setTimeout(() => window.open(`https://wa.me/${s.parent_phone}?text=${encodeURIComponent(msg)}`, "_blank"), sentCount * 400);
     sentCount++;

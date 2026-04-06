@@ -15,6 +15,7 @@ function switchTmpl(key){
 
 function insertVar(v){
   const ta=document.getElementById("tmpl-area");
+  if(!ta) return;
   const pos=ta.selectionStart;
   ta.value=ta.value.slice(0,pos)+v+ta.value.slice(pos);
   ta.focus();
@@ -46,62 +47,27 @@ function switchTab(id){
   if (event) event.target.classList.add("active");
 }
 
-async function checkCloudStatus() {
-  try {
-    const res = await fetch('/api/whatsapp-config');
-    const config = await res.json();
-    
-    const b_token = document.getElementById("status-token");
-    const b_phone = document.getElementById("status-phone");
-    const b_auto = document.getElementById("status-auto");
-    const pill = document.getElementById("cloud-pill");
-    const box = document.getElementById("cloud-status-box");
-
-    if (config.hasToken) {
-      b_token.textContent = "Valid";
-      b_token.className = "status-badge success";
-    } else {
-      b_token.textContent = "Missing";
-      b_token.className = "status-badge error";
-    }
-
-    if (config.hasPhoneId) {
-      b_phone.textContent = "Configured";
-      b_phone.className = "status-badge success";
-    } else {
-      b_phone.textContent = "Missing";
-      b_phone.className = "status-badge error";
-    }
-
-    if (config.hasToken && config.hasPhoneId) {
-      b_auto.textContent = "Active";
-      b_auto.className = "status-badge success";
-      pill.style.display = "flex";
-      box.innerHTML = `<div style="font-size:48px">✅</div><div class="qr-label" style="color:var(--green)">System Live</div>`;
-    } else {
-      b_auto.textContent = "Disabled";
-      b_auto.className = "status-badge busy";
-      pill.style.display = "none";
-      box.innerHTML = `<div style="font-size:48px">⚠️</div><div class="qr-label" style="color:var(--amber)">Setup Required</div>`;
-    }
-  } catch (e) {
-    console.error("Failed to fetch WhatsApp config:", e);
-  }
+function testWebhook(){
+  const url=document.getElementById("webhook-url").value;
+  if(!url){toast("Enter a webhook URL first","amber");return;}
+  toast("Sending test payload to n8n…","blue");
+  
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ test: true, message: "Hello from AttendX Manual Mode" })
+  })
+  .then(r => {
+    if(r.ok) toast("✓ Webhook responded 200 OK","green");
+    else toast("⚠️ Webhook returned error " + r.status, "amber");
+  })
+  .catch(e => toast("❌ Connection failed", "red"));
 }
 
-async function testCloudAPI() {
-  toast("Sending test message...", "blue");
-  try {
-    const res = await fetch('/api/test-whatsapp', { method: 'POST' });
-    if (res.ok) {
-      toast("✓ Test message sent!", "green");
-    } else {
-      const err = await res.json();
-      toast("❌ Error: " + (err.error || "Failed"), "red");
-    }
-  } catch (e) {
-    toast("❌ Connection failed", "red");
-  }
+function saveConfig(){
+  const url = document.getElementById("webhook-url").value;
+  localStorage.setItem("attendance_webhook_url", url);
+  toast("n8n configuration saved","green");
 }
 
 function toast(msg,color="green"){
@@ -118,5 +84,6 @@ function toast(msg,color="green"){
 
 document.addEventListener("DOMContentLoaded", () => {
     switchTmpl('absent');
-    checkCloudStatus();
+    const savedUrl = localStorage.getItem("attendance_webhook_url");
+    if(savedUrl) document.getElementById("webhook-url").value = savedUrl;
 });

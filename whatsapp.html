@@ -27,47 +27,62 @@
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('cloud')">⚡ Official Cloud API (Auto)</button>
-    <button class="tab" onclick="switchTab('wa-web')">📱 Manual Web Link (Backup)</button>
+    <button class="tab active" onclick="switchTab('wa-web')">📱 Manual Web Link (Primary)</button>
+    <button class="tab" onclick="switchTab('n8n')">⚡ n8n Automation (Advanced)</button>
   </div>
 
-  <!-- Panel 1: Cloud API -->
-  <div class="panel active" id="panel-cloud">
+  <!-- Panel 1: WA Web -->
+  <div class="panel active" id="panel-wa-web">
     <div class="wa-card">
-      <div class="qr-box" id="cloud-status-box">
-        <div class="qr-img">☁️</div>
-        <div class="qr-label">Checking API...</div>
+      <div class="qr-box" id="qr-box">
+        <div class="qr-img">📱</div>
+        <div class="qr-label">Manual Status</div>
+        <div class="status-badge success" id="status-badge" style="margin-top:10px">Ready</div>
       </div>
       <div class="wa-steps">
-        <h3>Meta Cloud API Status</h3>
+        <h3>Safe Manual Link Mode</h3>
         <div class="step-list">
           <div class="step">
             <div class="step-num">1</div>
-            <div class="step-text"><strong>API Token:</strong> <span id="status-token" class="status-badge busy">Checking...</span></div>
+            <div class="step-text">Open <strong>WhatsApp</strong> on your phone (Standard App) or browser.</div>
           </div>
           <div class="step">
             <div class="step-num">2</div>
-            <div class="step-text"><strong>Phone ID:</strong> <span id="status-phone" class="status-badge busy">Checking...</span></div>
+            <div class="step-text">On the Attendance dashboard, click <strong>"Notify"</strong> for absent students.</div>
           </div>
           <div class="step">
             <div class="step-num">3</div>
-            <div class="step-text"><strong>Automation:</strong> <span id="status-auto" class="status-badge busy">Disabled</span></div>
+            <div class="step-text">Your browser will open a new tab with the parent's phone number and the message ready. **Just click SEND.**</div>
           </div>
         </div>
-        <div class="status-pill sp-connected" id="cloud-pill" style="display:none">
+        <div class="status-pill sp-connected" id="status-pill">
           <div class="pulse"></div>
-          <span id="cloud-pill-text">Ready for Production</span>
+          <span id="status-text">Manual Mode Active — Using Personal Account</span>
         </div>
-        <div style="display:flex;gap:10px;margin-top:20px">
-          <button class="btn btn-primary" onclick="testCloudAPI()">⚡ Send Test Alert</button>
-          <a href="https://developers.facebook.com" target="_blank" class="btn btn-ghost" style="text-decoration:none">Meta Dashboard ↗</a>
+        <div style="margin-top:16px;font-size:12px;color:var(--muted)">
+          ℹ️ This method is 100% safe. It uses official WhatsApp <code style="font-family:var(--mono);color:var(--muted2)">wa.me</code> links.
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Panel 2: WA Web -->
-  <div class="panel" id="panel-wa-web">
+  <!-- Panel 2: n8n -->
+  <div class="panel" id="panel-n8n">
+    <div class="n8n-card" style="padding:24px;background:var(--card);border:1px solid var(--border);border-radius:12px">
+      <h3>n8n Automation (Optional)</h3>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:20px">If you decide to self-host n8n later, enter your webhook URL here. The portal will send a JSON payload whenever you trigger a notification.</p>
+      
+      <div class="form-group" style="margin-bottom:20px">
+        <label class="fl">n8n Webhook URL</label>
+        <input class="finput" id="webhook-url" type="text" placeholder="https://your-n8n.com/webhook/attendance"/>
+      </div>
+      
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" onclick="testWebhook()">⚡ Test Connection</button>
+        <button class="btn btn-ghost" onclick="saveConfig()">💾 Save Config</button>
+      </div>
+    </div>
+  </div>
     <div class="wa-card">
       <div class="qr-box" id="qr-box">
         <div class="qr-img">📱</div>

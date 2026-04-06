@@ -142,11 +142,6 @@ app.post('/api/attendance', async (req, res) => {
 
     if (error) return res.status(500).json({ error: error.message });
     
-    // Background WhatsApp Automation
-    triggerWhatsAppAlerts(records, date)
-        .then(() => console.log("WhatsApp automation success"))
-        .catch(e => console.error("WhatsApp automation fail", e));
-
     // Background Excel Sync
     exportAttendanceToExcel()
         .then(() => console.log("Excel sync success"))

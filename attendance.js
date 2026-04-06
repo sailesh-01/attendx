@@ -217,9 +217,20 @@ function resetAll() {
 }
 
 function buildMessage(s, status, date) {
-  const today = date || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"long",year:"numeric"});
-  const statusText = status === "A" ? "absent" : "on duty (OD)";
-  return `Dear Parent,\n\nYour ward *${s.name}* (${rollNo(s.short_code)}) was marked *${statusText}* on ${today} for the subject *Data Structures*.\n\nPlease contact the class coordinator for more details.\n\n— ${BATCH.deptName} Department`;
+    const savedTmpls = JSON.parse(localStorage.getItem("attendx_templates") || "{}");
+    let tmpl = savedTmpls[status === "A" ? "absent" : "od"];
+    
+    if (!tmpl) {
+        const today = date || new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" });
+        const statusText = status === "A" ? "absent" : "on duty (OD)";
+        return `Dear Parent,\n\nYour ward *${s.name}* (${rollNo(s.short_code)}) was marked *${statusText}* on ${today}.\n\n— ${BATCH.deptName} Department`;
+    }
+
+    return tmpl
+        .replace(/{{name}}/g, s.name)
+        .replace(/{{roll_no}}/g, rollNo(s.short_code))
+        .replace(/{{date}}/g, date || new Date().toLocaleDateString("en-IN"))
+        .replace(/{{department}}/g, BATCH.deptName);
 }
 
 function waLink(phone, msg) {
