@@ -439,17 +439,7 @@ async function triggerWhatsAppAlerts(records, date) {
                 body: JSON.stringify(payload)
             });
 
-          - [x] Configure environment variables in `.env`
-- [x] Provide Supabase SQL for `whatsapp_sent_at` column
-- [x] Implement WhatsApp Cloud API logic in `server.js`
-    - [x] Create `whatsappService` helper function
-    - [x] Integrate into `/api/attendance` POST endpoint
-    - [x] Update Supabase with `whatsapp_sent_at` timestamp on success
-- [/] Refactor `whatsapp.html` and `whatsapp.js`
-    - [x] Remove legacy QR scanning simulation
-    - [/] Add automation status indicators
-                
-                const result = await response.json();
+            const result = await response.json();
             if (response.ok) {
                 // Mark as sent in Supabase
                 await supabase
