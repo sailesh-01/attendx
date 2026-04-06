@@ -247,6 +247,27 @@ app.post('/api/register', async (req, res) => {
     res.status(201).json({ success: true, id: data[0].id });
 });
 
+// Admin Staff Management
+app.get('/api/admin/staff', async (req, res) => {
+    // Note: In production, add a proper session/token check here.
+    const { data: users, error } = await supabase
+        .from('users')
+        .select('id, username, assign_year, assign_section');
+
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(users);
+});
+
+app.delete('/api/admin/staff/:id', async (req, res) => {
+    const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', req.params.id);
+
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true });
+});
+
 // WhatsApp API Status
 app.get('/api/whatsapp-config', (req, res) => {
     res.json({

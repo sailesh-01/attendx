@@ -156,6 +156,21 @@ function setGlobalYear(year) {
 document.addEventListener("DOMContentLoaded", () => {
     const loggedStaff = localStorage.getItem("attendx_logged_staff");
     if (loggedStaff) {
+        // [ADMIN LINK INJECTION]
+        const mainNav = document.querySelector('nav');
+        if (loggedStaff === 'ADMIN' && mainNav && !document.getElementById('admin-nav-link')) {
+            const adminLink = document.createElement('a');
+            adminLink.id = 'admin-nav-link';
+            adminLink.className = 'nav-link';
+            adminLink.href = 'admin.html';
+            adminLink.innerHTML = '🛡️ Admin';
+            
+            // Try to insert before logout, or just append
+            const logout = mainNav.querySelector('.nav-logout');
+            if (logout) mainNav.insertBefore(adminLink, logout);
+            else mainNav.appendChild(adminLink);
+        }
+
         // Enforce the current year for this staff
         // Disable year selects if they exist
         const yearSelect = document.getElementById("year-select");
