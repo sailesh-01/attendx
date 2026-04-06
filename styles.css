@@ -708,7 +708,10 @@ th.sortable:hover { color: var(--text); background: rgba(255,255,255,0.05) !impo
   display: none;
   align-items: center;
   justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
+.modal-overlay.show { display: flex; opacity: 1; }
 
 .modal-card {
   width: min(90%, 400px);
@@ -723,8 +726,7 @@ th.sortable:hover { color: var(--text); background: rgba(255,255,255,0.05) !impo
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.modal-active .modal-overlay { display: flex; }
-.modal-active .modal-card { transform: scale(1); opacity: 1; }
+.modal-overlay.show .modal-card { transform: scale(1); opacity: 1; }
 
 .modal-card h2 { font-size: 20px; font-weight: 600; margin-bottom: 24px; color: var(--text); }
 

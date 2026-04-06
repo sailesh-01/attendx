@@ -247,8 +247,17 @@ app.post('/api/register', async (req, res) => {
     res.status(201).json({ success: true, id: data[0].id });
 });
 
-// Admin Staff Management
-app.get('/api/admin/staff', async (req, res) => {
+// Admin Staff Management Middleware
+const isAdmin = (req, res, next) => {
+    const adminUser = req.body?.adminUser || req.query?.adminUser || req.headers['x-admin-user'];
+    if (adminUser === 'ADMIN') {
+        next();
+    } else {
+        res.status(403).json({ error: "Access denied. Admin only." });
+    }
+};
+
+app.get('/api/admin/staff', isAdmin, async (req, res) => {
     // Note: In production, add a proper session/token check here.
     const { data: users, error } = await supabase
         .from('users')
@@ -258,7 +267,41 @@ app.get('/api/admin/staff', async (req, res) => {
     res.json(users);
 });
 
-app.delete('/api/admin/staff/:id', async (req, res) => {
+app.post('/api/admin/staff', isAdmin, async (req, res) => {
+    const { username, password, year, section } = req.body;
+    
+    // Check if username already exists
+    const { data: existing } = await supabase.from('users').select('id').eq('username', username).single();
+    if (existing) return res.status(400).json({ error: "Username already exists" });
+
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    const { data, error } = await supabase
+        .from('users')
+        .insert([{ username, password: hashedPassword, assign_year: year, assign_section: section }])
+        .select();
+
+    if (error) return res.status(500).json({ error: error.message });
+    res.status(201).json({ success: true, id: data[0].id });
+});
+
+app.put('/api/admin/staff/:id', isAdmin, async (req, res) => {
+    const { username, password, year, section } = req.body;
+    const updateData = { username, assign_year: year, assign_section: section };
+    
+    if (password) {
+        updateData.password = bcrypt.hashSync(password, 10);
+    }
+
+    const { error } = await supabase
+        .from('users')
+        .update(updateData)
+        .eq('id', req.params.id);
+
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true });
+});
+
+app.delete('/api/admin/staff/:id', isAdmin, async (req, res) => {
     const { error } = await supabase
         .from('users')
         .delete()

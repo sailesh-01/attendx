@@ -158,7 +158,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (loggedStaff) {
         // [ADMIN LINK INJECTION]
         const mainNav = document.querySelector('nav');
-        if (loggedStaff === 'ADMIN' && mainNav && !document.getElementById('admin-nav-link')) {
+        const existingAdmin = document.getElementById('admin-nav') || document.getElementById('admin-nav-link');
+        if (loggedStaff === 'ADMIN' && mainNav && !existingAdmin) {
             const adminLink = document.createElement('a');
             adminLink.id = 'admin-nav-link';
             adminLink.className = 'nav-link';
@@ -166,7 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
             adminLink.innerHTML = '🛡️ Admin';
             
             // Try to insert before logout, or just append
-            const logout = mainNav.querySelector('.nav-logout');
+            const logout = mainNav.querySelector('.nav-logout') || mainNav.querySelector('.nav-logout-btn') || mainNav.querySelector('.staff-profile-container');
             if (logout) mainNav.insertBefore(adminLink, logout);
             else mainNav.appendChild(adminLink);
         }
@@ -411,6 +412,8 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.appendChild(modal);
 
             modal.querySelector('.close-modal').addEventListener('click', () => {
+                modal.classList.remove('show');
+                setTimeout(() => modal.remove(), 300);
                 document.body.classList.remove('modal-active');
             });
 
@@ -451,6 +454,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
         
+        modal.classList.add('show');
         document.body.classList.add('modal-active');
     }
 });
