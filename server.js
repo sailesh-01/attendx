@@ -142,6 +142,11 @@ app.post('/api/attendance', async (req, res) => {
 
     if (error) return res.status(500).json({ error: error.message });
     
+    // Background WhatsApp Automation
+    triggerWhatsAppAlerts(records, date)
+        .then(() => console.log("WhatsApp automation success"))
+        .catch(e => console.error("WhatsApp automation fail", e));
+
     // Background Excel Sync
     exportAttendanceToExcel()
         .then(() => console.log("Excel sync success"))
@@ -245,6 +250,24 @@ app.post('/api/register', async (req, res) => {
 
     if (error) return res.status(500).json({ error: error.message });
     res.status(201).json({ success: true, id: data[0].id });
+});
+
+// WhatsApp API Status
+app.get('/api/whatsapp-config', (req, res) => {
+    res.json({
+        hasToken: !!process.env.WHATSAPP_TOKEN,
+        hasPhoneId: !!process.env.WHATSAPP_PHONE_ID,
+        templateName: process.env.WHATSAPP_TEMPLATE_NAME || 'None'
+    });
+});
+
+app.post('/api/test-whatsapp', async (req, res) => {
+    try {
+        await triggerWhatsAppAlerts([{ student_id: 'test', status: 'A' }], new Date().toISOString().split('T')[0]);
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
 // Weekly Cleanup Routine
@@ -355,6 +378,93 @@ async function exportAttendanceToExcel() {
         console.log(`Excel Sync: Updated ${rows.length} records`);
     } catch (e) {
         console.error("Excel export failed:", e);
+    }
+}
+
+// WhatsApp Automation Service
+async function triggerWhatsAppAlerts(records, date) {
+    const token = process.env.WHATSAPP_TOKEN;
+    const phoneId = process.env.WHATSAPP_PHONE_ID;
+    const templateName = process.env.WHATSAPP_TEMPLATE_NAME;
+
+    if (!token || !phoneId || !templateName) {
+        console.warn("WhatsApp credentials missing. Skipping automation.");
+        return;
+    }
+
+    const absentees = records.filter(r => r.status === 'A' || r.status === 'OD');
+    if (absentees.length === 0) return;
+
+    console.log(`Triggering WhatsApp for ${absentees.length} students...`);
+
+    for (const record of absentees) {
+        try {
+            // Fetch student details from Supabase
+            const { data: student, error } = await supabase
+                .from('students')
+                .select('name, roll_no, parent_phone, dept')
+                .eq('id', record.student_id)
+                .single();
+
+            if (error || !student || !student.parent_phone) continue;
+
+            const url = `https://graph.facebook.com/v21.0/${phoneId}/messages`;
+            const payload = {
+                messaging_product: "whatsapp",
+                to: student.parent_phone,
+                type: "template",
+                template: {
+                    name: templateName,
+                    language: { code: "en_US" },
+                    components: [
+                        {
+                            type: "body",
+                            parameters: [
+                                { type: "text", text: student.name },
+                                { type: "text", text: student.roll_no },
+                                { type: "text", text: date },
+                                { type: "text", text: student.dept || 'College' }
+                            ]
+                        }
+                    ]
+                }
+            };
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+          - [x] Configure environment variables in `.env`
+- [x] Provide Supabase SQL for `whatsapp_sent_at` column
+- [x] Implement WhatsApp Cloud API logic in `server.js`
+    - [x] Create `whatsappService` helper function
+    - [x] Integrate into `/api/attendance` POST endpoint
+    - [x] Update Supabase with `whatsapp_sent_at` timestamp on success
+- [/] Refactor `whatsapp.html` and `whatsapp.js`
+    - [x] Remove legacy QR scanning simulation
+    - [/] Add automation status indicators
+                
+                const result = await response.json();
+            if (response.ok) {
+                // Mark as sent in Supabase
+                await supabase
+                    .from('attendance')
+                    .update({ whatsapp_sent_at: new Date().toISOString() })
+                    .eq('student_id', record.student_id)
+                    .eq('date', date);
+                
+                console.log(`Alert sent to ${student.name} (${student.parent_phone})`);
+            } else {
+                console.error(`Meta API Error for ${student.name}:`, result.error?.message || result);
+            }
+        } catch (e) {
+            console.error(`Failed to send alert for student ID ${record.student_id}:`, e);
+        }
     }
 }
 

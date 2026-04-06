@@ -26,12 +26,47 @@
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('wa-web')">📱 WA Web (Simple)</button>
-    <button class="tab" onclick="switchTab('n8n')">⚡ n8n Automation (Advanced)</button>
+    <button class="tab active" onclick="switchTab('cloud')">⚡ Official Cloud API (Auto)</button>
+    <button class="tab" onclick="switchTab('wa-web')">📱 Manual Web Link (Backup)</button>
   </div>
 
-  <!-- Panel 1: WA Web -->
-  <div class="panel active" id="panel-wa-web">
+  <!-- Panel 1: Cloud API -->
+  <div class="panel active" id="panel-cloud">
+    <div class="wa-card">
+      <div class="qr-box" id="cloud-status-box">
+        <div class="qr-img">☁️</div>
+        <div class="qr-label">Checking API...</div>
+      </div>
+      <div class="wa-steps">
+        <h3>Meta Cloud API Status</h3>
+        <div class="step-list">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-text"><strong>API Token:</strong> <span id="status-token" class="status-badge busy">Checking...</span></div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-text"><strong>Phone ID:</strong> <span id="status-phone" class="status-badge busy">Checking...</span></div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-text"><strong>Automation:</strong> <span id="status-auto" class="status-badge busy">Disabled</span></div>
+          </div>
+        </div>
+        <div class="status-pill sp-connected" id="cloud-pill" style="display:none">
+          <div class="pulse"></div>
+          <span id="cloud-pill-text">Ready for Production</span>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:20px">
+          <button class="btn btn-primary" onclick="testCloudAPI()">⚡ Send Test Alert</button>
+          <a href="https://developers.facebook.com" target="_blank" class="btn btn-ghost" style="text-decoration:none">Meta Dashboard ↗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel 2: WA Web -->
+  <div class="panel" id="panel-wa-web">
     <div class="wa-card">
       <div class="qr-box" id="qr-box">
         <div class="qr-img">📱</div>
@@ -47,16 +82,16 @@
           </div>
           <div class="step">
             <div class="step-num">2</div>
-            <div class="step-text">Tap <strong>Linked Devices</strong> → <strong>Link a Device</strong> → scan the QR code shown on the left</div>
+            <div class="step-text">Tap <strong>Linked Devices</strong> → <strong>Link a Device</strong></div>
           </div>
           <div class="step">
             <div class="step-num">3</div>
-            <div class="step-text">Once connected, all notification buttons open <strong>WhatsApp Web</strong> directly with the message pre-filled — you just tap Send</div>
+            <div class="step-text">When you trigger a notification, it will open <strong>WhatsApp Web</strong> with the message pre-filled — you just tap Send</div>
           </div>
         </div>
         <div class="status-pill sp-waiting" id="status-pill">
           <div class="pulse"></div>
-          <span id="status-text">Waiting for scan…</span>
+          <span id="status-text">Manual Mode Active</span>
         </div>
         <div style="margin-top:16px;font-size:12px;color:var(--muted)">
           ℹ️ This method uses <code style="font-family:var(--mono);color:var(--muted2)">wa.me</code> links — no API key or paid plan required. Works on any device with WhatsApp installed.
@@ -65,52 +100,6 @@
     </div>
   </div>
 
-  <!-- Panel 2: n8n -->
-  <div class="panel" id="panel-n8n">
-    <div class="n8n-card">
-      <h3>Configure n8n Webhook — Fully Automatic Sending</h3>
-      <div class="info-box">
-        With n8n, your Django backend posts a webhook and messages go out <strong>automatically</strong> — no staff clicks needed. Self-host n8n free on your college server, or use n8n Cloud.
-      </div>
-
-      <div class="form-row">
-        <div class="form-group full">
-          <label class="fl">n8n Webhook URL</label>
-          <input class="finput" id="webhook-url" type="text" placeholder="https://your-n8n.college.edu/webhook/attendance"/>
-        </div>
-        <div class="form-group">
-          <label class="fl">WA Gateway</label>
-          <select class="finput" id="wa-gateway" style="cursor:pointer">
-            <option>WhatsApp Business API (Meta)</option>
-            <option>Twilio WhatsApp</option>
-            <option>Interakt</option>
-            <option>WATI</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="fl">API Key / Token</label>
-          <input class="finput" id="api-key" type="password" placeholder="••••••••••••••"/>
-        </div>
-      </div>
-
-      <div style="margin-bottom:14px">
-        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-family:var(--mono)">Django fires this JSON payload to your webhook:</div>
-        <div class="code-block">
-          <span class="br">{</span><br>
-          &nbsp;&nbsp;<span class="key">"session"</span>: <span class="val">"ES24AD · Data Structures · 2026-03-25"</span>,<br>
-          &nbsp;&nbsp;<span class="key">"type"</span>: <span class="val">"attendance"</span>, &nbsp;<span class="br">// or "marks"</span><br>
-          &nbsp;&nbsp;<span class="key">"students"</span>: [<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;<span class="br">{</span> <span class="key">"roll"</span>: <span class="val">"ES24AD101"</span>, <span class="key">"name"</span>: <span class="val">"Ravi Kumar"</span>, <span class="key">"status"</span>: <span class="val">"absent"</span>, <span class="key">"parent_phone"</span>: <span class="val">"919876543211"</span> <span class="br">}</span><br>
-          &nbsp;&nbsp;]<br>
-          <span class="br">}</span>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:10px">
-        <button class="btn btn-primary" onclick="testWebhook()">⚡ Test Webhook</button>
-        <button class="btn btn-ghost" onclick="saveConfig()">💾 Save Config</button>
-      </div>
-    </div>
   </div>
 
   <!-- Message Templates (shared) -->
