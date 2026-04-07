@@ -39,10 +39,11 @@ async function fetchStudents(year = CURRENT_YEAR) {
 
 async function saveAttendanceRecords(records) {
     try {
+        const username = localStorage.getItem("attendx_logged_staff");
         const response = await fetch(`${API_URL}/attendance`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(records)
+            body: JSON.stringify({ ...records, username })
         });
         return await response.json();
     } catch (error) {

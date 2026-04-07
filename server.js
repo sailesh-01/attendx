@@ -147,6 +147,50 @@ app.post('/api/attendance', async (req, res) => {
         .then(() => console.log("Excel sync success"))
         .catch(e => console.error("Excel sync fail", e));
 
+    // Dynamic n8n WhatsApp Trigger
+    const { username } = req.body;
+    if (username) {
+        const { data: user } = await supabase
+            .from('users')
+            .select('whatsapp_token, whatsapp_phone_id, whatsapp_template_name')
+            .eq('username', username)
+            .single();
+
+        if (user && user.whatsapp_token && user.whatsapp_phone_id) {
+            const n8nUrl = "https://mixip-n8n.hf.space/webhook-test/attendance-alert";
+            const absentees = records.filter(r => r.status === 'A' || r.status === 'OD');
+            
+            if (absentees.length > 0) {
+                // Fetch student names for n8n payload
+                const { data: studentDetails } = await supabase
+                    .from('students')
+                    .select('id, name, roll_no, parent_phone, dept')
+                    .in('id', absentees.map(a => a.student_id));
+
+                const richRecords = absentees.map(a => {
+                    const s = studentDetails?.find(st => st.id === a.student_id) || {};
+                    return { ...a, ...s };
+                });
+
+                fetch(n8nUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        staff_username: username,
+                        whatsapp_config: {
+                            token: user.whatsapp_token,
+                            phone_id: user.whatsapp_phone_id,
+                            template: user.whatsapp_template_name
+                        },
+                        date: date,
+                        records: richRecords
+                    })
+                }).then(() => console.log(`n8n triggered for ${username}`))
+                  .catch(e => console.error("n8n trigger failed", e));
+            }
+        }
+    }
+
     res.json({ success: true });
 });
 
@@ -240,7 +284,15 @@ app.post('/api/register', async (req, res) => {
     const hashedPassword = bcrypt.hashSync(password, 10);
     const { data, error } = await supabase
         .from('users')
-        .insert([{ username, password: hashedPassword, assign_year: year, assign_section: section }])
+        .insert([{ 
+            username, 
+            password: hashedPassword, 
+            assign_year: year, 
+            assign_section: section,
+            whatsapp_token,
+            whatsapp_phone_id,
+            whatsapp_template_name
+        }])
         .select();
 
     if (error) return res.status(500).json({ error: error.message });
@@ -261,14 +313,14 @@ app.get('/api/admin/staff', isAdmin, async (req, res) => {
     // Note: In production, add a proper session/token check here.
     const { data: users, error } = await supabase
         .from('users')
-        .select('id, username, assign_year, assign_section');
+        .select('id, username, assign_year, assign_section, whatsapp_token, whatsapp_phone_id, whatsapp_template_name');
 
     if (error) return res.status(500).json({ error: error.message });
     res.json(users);
 });
 
 app.post('/api/admin/staff', isAdmin, async (req, res) => {
-    const { username, password, year, section } = req.body;
+    const { username, password, year, section, whatsapp_token, whatsapp_phone_id, whatsapp_template_name } = req.body;
     
     // Check if username already exists
     const { data: existing } = await supabase.from('users').select('id').eq('username', username).single();
@@ -277,7 +329,15 @@ app.post('/api/admin/staff', isAdmin, async (req, res) => {
     const hashedPassword = bcrypt.hashSync(password, 10);
     const { data, error } = await supabase
         .from('users')
-        .insert([{ username, password: hashedPassword, assign_year: year, assign_section: section }])
+        .insert([{ 
+            username, 
+            password: hashedPassword, 
+            assign_year: year, 
+            assign_section: section,
+            whatsapp_token,
+            whatsapp_phone_id,
+            whatsapp_template_name
+        }])
         .select();
 
     if (error) return res.status(500).json({ error: error.message });
@@ -285,8 +345,15 @@ app.post('/api/admin/staff', isAdmin, async (req, res) => {
 });
 
 app.put('/api/admin/staff/:id', isAdmin, async (req, res) => {
-    const { username, password, year, section } = req.body;
-    const updateData = { username, assign_year: year, assign_section: section };
+    const { username, password, year, section, whatsapp_token, whatsapp_phone_id, whatsapp_template_name } = req.body;
+    const updateData = { 
+        username, 
+        assign_year: year, 
+        assign_section: section,
+        whatsapp_token,
+        whatsapp_phone_id,
+        whatsapp_template_name
+    };
     
     if (password) {
         updateData.password = bcrypt.hashSync(password, 10);

@@ -88,7 +88,25 @@
                 </select>
             </div>
         </div>
+        <div class="whatsapp-config" style="margin-top:20px; padding-top:15px; border-top:1px solid var(--border);">
+            <h3 style="font-size:14px; color:var(--accent); margin-bottom:15px;">💬 WhatsApp Configuration</h3>
+            <div class="input-group">
+                <label>WhatsApp Token</label>
+                <input type="password" id="add-whatsapp-token" class="input-field" placeholder="Meta Graph API Token">
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Phone ID</label>
+                    <input type="text" id="add-whatsapp-phone-id" class="input-field" placeholder="15-digit ID">
+                </div>
+                <div class="form-group">
+                    <label>Template Name</label>
+                    <input type="text" id="add-whatsapp-template" class="input-field" placeholder="e.g. attendance_alert">
+                </div>
+            </div>
+        </div>
         <div id="add-error" class="error-msg" style="color:var(--red); font-size:12px; margin-top:10px; display:none;"></div>
+
         <div class="modal-footer">
             <button class="btn btn-ghost" onclick="closeModal('add-staff-modal')">Cancel</button>
             <button class="btn btn-primary" id="save-new-staff">Create Account</button>
@@ -129,7 +147,25 @@
                 </select>
             </div>
         </div>
+        <div class="whatsapp-config" style="margin-top:20px; padding-top:15px; border-top:1px solid var(--border);">
+            <h3 style="font-size:14px; color:var(--accent); margin-bottom:15px;">💬 WhatsApp Configuration</h3>
+            <div class="input-group">
+                <label>WhatsApp Token</label>
+                <input type="password" id="edit-whatsapp-token" class="input-field" placeholder="Meta Graph API Token">
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Phone ID</label>
+                    <input type="text" id="edit-whatsapp-phone-id" class="input-field" placeholder="15-digit ID">
+                </div>
+                <div class="form-group">
+                    <label>Template Name</label>
+                    <input type="text" id="edit-whatsapp-template" class="input-field" placeholder="e.g. attendance_alert">
+                </div>
+            </div>
+        </div>
         <div id="edit-error" class="error-msg" style="color:var(--red); font-size:12px; margin-top:10px; display:none;"></div>
+
         <div class="modal-footer">
             <button class="btn btn-ghost" onclick="closeModal('edit-staff-modal')">Cancel</button>
             <button class="btn btn-primary" id="update-staff">Update Credentials</button>

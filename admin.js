@@ -105,6 +105,9 @@ function closeModal(id) {
 document.getElementById('btn-add-staff').onclick = () => {
     document.getElementById('add-username').value = "";
     document.getElementById('add-password').value = "";
+    document.getElementById('add-whatsapp-token').value = "";
+    document.getElementById('add-whatsapp-phone-id').value = "";
+    document.getElementById('add-whatsapp-template').value = "";
     document.getElementById('add-error').style.display = 'none';
     openModal('add-staff-modal');
 };
@@ -114,6 +117,9 @@ document.getElementById('save-new-staff').onclick = async () => {
     const password = document.getElementById('add-password').value.trim();
     const year = document.getElementById('add-year').value;
     const section = document.getElementById('add-section').value;
+    const whatsappToken = document.getElementById('add-whatsapp-token').value.trim();
+    const phoneId = document.getElementById('add-whatsapp-phone-id').value.trim();
+    const template = document.getElementById('add-whatsapp-template').value.trim();
     const errEl = document.getElementById('add-error');
 
     if (!username || !password) {
@@ -132,7 +138,13 @@ document.getElementById('save-new-staff').onclick = async () => {
         const response = await fetch('/api/admin/staff', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password, year, section, adminUser: 'ADMIN' })
+            body: JSON.stringify({ 
+                username, password, year, section, 
+                whatsapp_token: whatsappToken, 
+                whatsapp_phone_id: phoneId, 
+                whatsapp_template_name: template,
+                adminUser: 'ADMIN' 
+            })
         });
         const result = await response.json();
         if (response.ok) {
@@ -165,6 +177,9 @@ function openEditModal(id) {
     document.getElementById('edit-password').value = "";
     document.getElementById('edit-year').value = staff.assign_year || 1;
     document.getElementById('edit-section').value = staff.assign_section || "A";
+    document.getElementById('edit-whatsapp-token').value = staff.whatsapp_token || "";
+    document.getElementById('edit-whatsapp-phone-id').value = staff.whatsapp_phone_id || "";
+    document.getElementById('edit-whatsapp-template').value = staff.whatsapp_template_name || "";
     document.getElementById('edit-error').style.display = 'none';
     openModal('edit-staff-modal');
 }
@@ -175,6 +190,9 @@ document.getElementById('update-staff').onclick = async () => {
     const password = document.getElementById('edit-password').value.trim();
     const year = document.getElementById('edit-year').value;
     const section = document.getElementById('edit-section').value;
+    const whatsappToken = document.getElementById('edit-whatsapp-token').value.trim();
+    const phoneId = document.getElementById('edit-whatsapp-phone-id').value.trim();
+    const template = document.getElementById('edit-whatsapp-template').value.trim();
     const errEl = document.getElementById('edit-error');
 
     if (!username) {
@@ -183,7 +201,13 @@ document.getElementById('update-staff').onclick = async () => {
         return;
     }
 
-    const payload = { username, year, section, adminUser: 'ADMIN' };
+    const payload = { 
+        username, year, section, 
+        whatsapp_token: whatsappToken, 
+        whatsapp_phone_id: phoneId, 
+        whatsapp_template_name: template,
+        adminUser: 'ADMIN' 
+    };
     if (password) {
         if (password.length < 4) {
             errEl.textContent = "New password must be at least 4 characters.";
