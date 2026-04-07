@@ -108,6 +108,7 @@ document.getElementById('btn-add-staff').onclick = () => {
     document.getElementById('add-whatsapp-token').value = "";
     document.getElementById('add-whatsapp-phone-id').value = "";
     document.getElementById('add-whatsapp-template').value = "";
+    document.getElementById('add-email').value = "";
     document.getElementById('add-error').style.display = 'none';
     openModal('add-staff-modal');
 };
@@ -120,6 +121,7 @@ document.getElementById('save-new-staff').onclick = async () => {
     const whatsappToken = document.getElementById('add-whatsapp-token').value.trim();
     const phoneId = document.getElementById('add-whatsapp-phone-id').value.trim();
     const template = document.getElementById('add-whatsapp-template').value.trim();
+    const email = document.getElementById('add-email').value.trim();
     const errEl = document.getElementById('add-error');
 
     if (!username || !password) {
@@ -143,6 +145,7 @@ document.getElementById('save-new-staff').onclick = async () => {
                 whatsapp_token: whatsappToken, 
                 whatsapp_phone_id: phoneId, 
                 whatsapp_template_name: template,
+                email: email,
                 adminUser: 'ADMIN' 
             })
         });
@@ -180,6 +183,7 @@ function openEditModal(id) {
     document.getElementById('edit-whatsapp-token').value = staff.whatsapp_token || "";
     document.getElementById('edit-whatsapp-phone-id').value = staff.whatsapp_phone_id || "";
     document.getElementById('edit-whatsapp-template').value = staff.whatsapp_template_name || "";
+    document.getElementById('edit-email').value = staff.email || "";
     document.getElementById('edit-error').style.display = 'none';
     openModal('edit-staff-modal');
 }
@@ -193,6 +197,7 @@ document.getElementById('update-staff').onclick = async () => {
     const whatsappToken = document.getElementById('edit-whatsapp-token').value.trim();
     const phoneId = document.getElementById('edit-whatsapp-phone-id').value.trim();
     const template = document.getElementById('edit-whatsapp-template').value.trim();
+    const email = document.getElementById('edit-email').value.trim();
     const errEl = document.getElementById('edit-error');
 
     if (!username) {
@@ -206,6 +211,7 @@ document.getElementById('update-staff').onclick = async () => {
         whatsapp_token: whatsappToken, 
         whatsapp_phone_id: phoneId, 
         whatsapp_template_name: template,
+        email: email,
         adminUser: 'ADMIN' 
     };
     if (password) {

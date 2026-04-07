@@ -325,14 +325,14 @@ app.get('/api/admin/staff', isAdmin, async (req, res) => {
     // Note: In production, add a proper session/token check here.
     const { data: users, error } = await supabase
         .from('users')
-        .select('id, username, assign_year, assign_section, whatsapp_token, whatsapp_phone_id, whatsapp_template_name');
+        .select('id, username, assign_year, assign_section, email, whatsapp_token, whatsapp_phone_id, whatsapp_template_name');
 
     if (error) return res.status(500).json({ error: error.message });
     res.json(users);
 });
 
 app.post('/api/admin/staff', isAdmin, async (req, res) => {
-    const { username, password, year, section, whatsapp_token, whatsapp_phone_id, whatsapp_template_name } = req.body;
+    const { username, password, year, section, email, whatsapp_token, whatsapp_phone_id, whatsapp_template_name } = req.body;
     
     // Check if username already exists
     const { data: existing } = await supabase.from('users').select('id').eq('username', username).single();
@@ -346,6 +346,7 @@ app.post('/api/admin/staff', isAdmin, async (req, res) => {
             password: hashedPassword, 
             assign_year: year, 
             assign_section: section,
+            email,
             whatsapp_token,
             whatsapp_phone_id,
             whatsapp_template_name
@@ -357,11 +358,12 @@ app.post('/api/admin/staff', isAdmin, async (req, res) => {
 });
 
 app.put('/api/admin/staff/:id', isAdmin, async (req, res) => {
-    const { username, password, year, section, whatsapp_token, whatsapp_phone_id, whatsapp_template_name } = req.body;
+    const { username, password, year, section, email, whatsapp_token, whatsapp_phone_id, whatsapp_template_name } = req.body;
     const updateData = { 
         username, 
         assign_year: year, 
         assign_section: section,
+        email,
         whatsapp_token,
         whatsapp_phone_id,
         whatsapp_template_name
