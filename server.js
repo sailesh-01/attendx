@@ -194,6 +194,18 @@ app.post('/api/attendance', async (req, res) => {
     res.json({ success: true });
 });
 
+app.put('/api/attendance/mark-sent', async (req, res) => {
+    const { student_id, date } = req.body;
+    const { error } = await supabase
+        .from('attendance')
+        .update({ whatsapp_sent_at: new Date().toISOString() })
+        .eq('student_id', student_id)
+        .eq('date', date);
+        
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true });
+});
+
 // Marks
 app.get('/api/marks', async (req, res) => {
     const { year, section, exam_type } = req.query;

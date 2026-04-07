@@ -52,6 +52,20 @@ async function saveAttendanceRecords(records) {
     }
 }
 
+async function apiMarkAttendanceSent(student_id, date) {
+    try {
+        const response = await fetch(`${API_URL}/attendance/mark-sent`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ student_id, date })
+        });
+        return await response.json();
+    } catch (error) {
+        console.error("Failed to mark attendance as sent:", error);
+        return { success: false };
+    }
+}
+
 async function fetchAttendance(date, year = CURRENT_YEAR) {
     try {
         const section = CURRENT_SECTION;

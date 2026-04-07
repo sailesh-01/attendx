@@ -1,4 +1,5 @@
 const attendance = {};
+const sentStatus = {};
 
 async function initAttendance() {
     const selector = document.getElementById("year-select");
@@ -38,6 +39,9 @@ async function loadData() {
     const existing = await fetchAttendance(today, CURRENT_YEAR);
     existing.forEach(record => {
         attendance[String(record.short_code)] = record.status;
+        if (record.whatsapp_sent_at) {
+            sentStatus[String(record.short_code)] = record.whatsapp_sent_at;
+        }
     });
 
     renderTable();
@@ -122,7 +126,7 @@ function renderTable() {
     
     // Row click toggle (P -> A)
     tr.onclick = (e) => {
-        if (e.target.tagName === 'BUTTON') return;
+        if (e.target.tagName === 'BUTTON' || e.target.closest('.wa-sent-badge')) return;
         const nextStatus = st === 'P' ? 'A' : 'P';
         setAtt(sc, nextStatus);
         if (nextStatus === 'P') {
@@ -131,8 +135,11 @@ function renderTable() {
         }
     };
 
+    const sentAt = sentStatus[sc];
+    const sentBadge = sentAt ? `<span class="wa-sent-badge" title="Sent at ${new Date(sentAt).toLocaleTimeString()}">📬 Sent</span>` : "";
+
     tr.innerHTML = `
-      <td class="sno">${s.sno}</td>
+      <td class="sno">${s.sno} ${sentBadge}</td>
       <td><span class="short-code">${sc}</span></td>
       <td><span class="roll-no">${rollNo(sc)}</span></td>
       <td class="name-cell">
@@ -243,6 +250,9 @@ let sentSet = new Set();
 function openModal() {
   batchStudents = students.filter(s => attendance[s.short_code] === "A" || attendance[s.short_code] === "OD");
   sentSet = new Set();
+  batchStudents.forEach((s, i) => {
+      if (sentStatus[s.short_code]) sentSet.add(i);
+  });
   renderModalList();
   document.getElementById("modal").classList.add("show");
 }
@@ -331,17 +341,28 @@ async function sendAll() {
 
 function renderModalList(showWarning = false) {
   const list = document.getElementById("modal-list");
+  const isAuto = sendingMode === 'auto';
+  const remaining = batchStudents.filter((_, i) => !sentSet.has(i)).length;
+
   list.innerHTML = `
     <div class="mode-select">
-      <div class="mode-label">Sending Mode:</div>
+      <div class="mode-label">Mode: ${remaining} Remaining</div>
       <div class="mode-btn-group">
-        <button class="m-btn ${sendingMode === 'tabs' ? 'active' : ''}" onclick="toggleSendingMode('tabs')">📱 Browser Tabs</button>
-        <button class="m-btn ${sendingMode === 'auto' ? 'active' : ''}" onclick="toggleSendingMode('auto')">⚡ Fully Auto (n8n)</button>
+        <button class="m-btn ${!isAuto?'active':''}" onclick="toggleSendingMode('tabs')">📱 Browser Tabs</button>
+        <button class="m-btn ${isAuto?'active':''}" onclick="toggleSendingMode('auto')">⚡ Fully Auto (n8n)</button>
       </div>
     </div>
+    ${!isAuto ? `
+      <div class="next-action-card" style="margin-bottom: 20px; text-align: center; background: var(--surface2); padding: 15px; border-radius: 10px; border: 1px solid var(--border);">
+        <button class="btn btn-wa-all" style="width: 100%; justify-content: center; background: #25D366; color: white;" onclick="sendNext()" ${remaining === 0 ? 'disabled' : ''}>
+          ${remaining > 0 ? '🚀 Send Next Student' : '✅ All Notified!'}
+        </button>
+        <p class="next-hint" style="font-size: 11px; color: var(--muted); margin-top: 8px;">Opens WhatsApp Web for the next absentee</p>
+      </div>
+    ` : ''}
   `;
-  
-  if (showWarning && sendingMode === 'tabs') {
+
+  if (showWarning && !isAuto) {
     const warn = document.createElement("div");
     warn.className = "popup-warning";
     warn.innerHTML = `
@@ -351,46 +372,78 @@ function renderModalList(showWarning = false) {
     list.appendChild(warn);
   }
 
-  let nextIndex = -1;
   batchStudents.forEach((s, i) => {
-    if (nextIndex === -1 && !sentSet.has(i)) nextIndex = i;
-  });
-
-  batchStudents.forEach((s, i) => {
-    const isSent = sentSet.has(i);
-    const st = attendance[s.short_code] || "P";
-    const msg = buildMessage(s, st);
-    const div = document.createElement("div");
-    div.className = `notify-row ${i === nextIndex ? 'current-batch' : ''} ${isSent ? 'sent-batch' : ''}`;
-    div.innerHTML = `
+      const st = attendance[s.short_code];
+      const isSent = sentSet.has(i);
+      const msg = buildMessage(s.name, rollNo(s.short_code), st);
+      const div = document.createElement("div");
+      div.className = `notify-row ${isSent ? 'sent-batch' : ''}`;
+      div.id = `nr-${i}`;
+      div.innerHTML = `
       <div class="notify-info">
         <div class="notify-name">${s.name} ${isSent ? '✅' : ''}
           <span class="notify-status ${st==='A'?'ns-absent':'ns-od'}" style="margin-left:6px">${st}</span>
         </div>
         <div class="notify-meta">${rollNo(s.short_code)} &nbsp;·&nbsp; Parent: +${s.parent_phone}</div>
       </div>
-      <a class="wa-btn" href="${waLink(s.parent_phone, msg)}" target="_blank" onclick="sentSet.add(${i}); renderModalList();">
+      <a class="wa-btn" href="${waLink(s.parent_phone, msg)}" target="_blank" onclick="markSentLocal(${i}, ${s.id})">
         💬 Send
       </a>`;
-    list.appendChild(div);
+      list.appendChild(div);
   });
 
-  const btn = document.querySelector(".btn-wa-all");
-  if (btn) {
-    if (nextIndex !== -1) {
-      btn.textContent = sendingMode === 'auto' ? `⚡ Send All Automatically (${sentSet.size + 1}/${batchStudents.length})` : `🚀 Open All Automatically (${sentSet.size + 1}/${batchStudents.length})`;
-      btn.disabled = false;
-      btn.style.opacity = "1";
-    } else {
-      btn.textContent = `✅ All Notified`;
-      btn.disabled = true;
-      btn.style.opacity = "0.5";
-    }
+  if (isAuto && batchStudents.length > 0) {
+      const row = document.createElement("div");
+      row.innerHTML = `
+        <button class="btn-wa-all" onclick="sendAll()" style="width:100%; border:none; padding:12px; background:var(--accent); color:white; border-radius:8px; font-weight:600; cursor:pointer;">
+          ⚡ Send All via n8n Webhook
+        </button>
+        <div class="info-box" style="margin-top:10px; font-size:11px; color:var(--muted); text-align:center;">
+          This sends data to your n8n workflow for full automation.
+        </div>
+      `;
+      list.appendChild(row);
   }
+}
+
+function sendNext() {
+    const nextIdx = batchStudents.findIndex((_, i) => !sentSet.has(i));
+    if (nextIdx === -1) return;
+    
+    const s = batchStudents[nextIdx];
+    const st = attendance[s.short_code];
+    const msg = buildMessage(s.name, rollNo(s.short_code), st);
+    
+    // Open link
+    window.open(waLink(s.parent_phone, msg), '_blank');
+    
+    // Mark as sent
+    markSentLocal(nextIdx, s.id);
+    
+    // Scroll the list to the next one
+    setTimeout(() => {
+        const nextEl = document.getElementById(`nr-${nextIdx + 1}`);
+        if (nextEl) nextEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
 }
 
 function closeModal() {
   document.getElementById("modal").classList.remove("show");
+}
+
+async function markSentLocal(idx, student_id) {
+    const s = batchStudents[idx];
+    if (!s) return;
+    
+    sentSet.add(idx);
+    const now = new Date().toISOString();
+    sentStatus[s.short_code] = now;
+    
+    renderModalList();
+    renderTable();
+    
+    const today = new Date().toISOString().split('T')[0];
+    apiMarkAttendanceSent(student_id, today).catch(console.error);
 }
 
 function showToast(msg) {
