@@ -375,7 +375,7 @@ function renderModalList(showWarning = false) {
   batchStudents.forEach((s, i) => {
       const st = attendance[s.short_code];
       const isSent = sentSet.has(i);
-      const msg = buildMessage(s.name, rollNo(s.short_code), st);
+      const msg = buildMessage(s, st);
       const div = document.createElement("div");
       div.className = `notify-row ${isSent ? 'sent-batch' : ''}`;
       div.id = `nr-${i}`;
@@ -412,7 +412,7 @@ function sendNext() {
     
     const s = batchStudents[nextIdx];
     const st = attendance[s.short_code];
-    const msg = buildMessage(s.name, rollNo(s.short_code), st);
+    const msg = buildMessage(s, st);
     
     // Open link
     window.open(waLink(s.parent_phone, msg), '_blank');
