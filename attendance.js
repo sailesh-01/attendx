@@ -198,9 +198,12 @@ async function applyAttendance() {
   const absentList = parse(absentRaw).map(String);
   const odList = parse(odRaw).map(String);
   
-  (window.students || []).forEach(s => attendance[String(s.short_code)] = "P");
   absentList.forEach(n => { if(attendance[n]!==undefined) attendance[n]="A"; });
   odList.forEach(n => { if(attendance[n]!==undefined) attendance[n]="OD"; });
+  
+  // Clear inputs after applying so subsequent entries don't re-apply or look stagnant
+  document.getElementById("absent-input").value = "";
+  document.getElementById("od-input").value = "";
   
   renderTable();
   
