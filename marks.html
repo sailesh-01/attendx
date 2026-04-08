@@ -1,143 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AttendX — Marks</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<link rel="icon" type="image/jpeg" href="ideogram.jpg"/>
-<link rel="stylesheet" href="styles.css"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AttendX — Marks</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="icon" type="image/jpeg" href="ideogram.jpg" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
-<nav>
-  <span class="nav-logo">AttendX</span>
-  <a class="nav-link" href="attendance.html">📋 Attendance</a>
-  <a class="nav-link" href="students.html">👥 Students</a>
+  <nav>
+    <span class="nav-logo">AttendX</span>
+    <a class="nav-link" href="attendance.html">📋 Attendance</a>
+    <a class="nav-link" href="students.html">👥 Students</a>
 
-  <a class="nav-link" href="whatsapp.html">💬 WhatsApp</a>
-  <a class="nav-link nav-logout" href="index.html">🚪 Logout</a>
-</nav>
-<div class="main">
-  <div class="page-header">
-    <div>
-      <div class="page-title">Marks Entry &amp; Notification</div>
-      <div class="page-sub">Enter marks, auto-grade, then notify parents via WhatsApp · 
-        <select class="sel" id="year-filter" onchange="changeYear(this.value)" style="padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 5px; height: 24px;">
-          <option value="2">2nd Year</option>
-          <option value="3">3rd Year</option>
-          <option value="4">4th Year</option>
-        </select>
+    <a class="nav-link" href="whatsapp.html">💬 WhatsApp</a>
+    <a class="nav-link nav-logout" href="index.html">🚪 Logout</a>
+  </nav>
+  <div class="main">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Marks Entry &amp; Notification</div>
+        <div class="page-sub">Enter marks, auto-grade, then notify parents via WhatsApp ·
+          <select class="sel" id="year-filter" onchange="changeYear(this.value)"
+            style="padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 5px; height: 24px;">
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" onclick="fillSample()">Load sample data</button>
+        <button class="btn btn-notify" id="notify-btn" onclick="openModal()" disabled>💬 Notify Parents</button>
       </div>
     </div>
-    <div style="display:flex;gap:10px">
-      <button class="btn btn-ghost" onclick="fillSample()">Load sample data</button>
-      <button class="btn btn-notify" id="notify-btn" onclick="openModal()" disabled>💬 Notify Parents</button>
+
+    <!-- Config row -->
+    <div class="config-row" style="margin-bottom: 24px;">
+      <div class="field-group">
+        <label class="fl">Exam Type</label>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <select class="sel" id="exam-type" onchange="updateConfig()">
+            <option>CIA 1</option>
+            <option>CIA 2</option>
+            <option>CIA 3</option>
+            <option>End Semester</option>
+            <option>Assignment</option>
+          </select>
+          <button class="btn btn-ghost btn-sm admin-only" id="add-exam-btn" onclick="addExamTypePrompt()"
+            title="Add Exam Type"
+            style="display: none; padding: 4px 8px; min-width: 32px; height: 32px; justify-content: center;">＋</button>
+          <button class="btn btn-ghost btn-sm admin-only" id="remove-exam-btn" onclick="removeExamTypePrompt()"
+            title="Remove Current Exam Type"
+            style="display: none; padding: 4px 8px; min-width: 32px; height: 32px; justify-content: center;">✕</button>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="fl">Max Marks</label>
+        <input class="finput" id="max-marks" type="number" value="50" style="width:90px" onchange="recalcAll()" />
+      </div>
+      <div class="divider-v" style="height: 32px; align-self: flex-end; margin: 0 10px;"></div>
+      <div class="field-group" style="flex:1">
+        <label class="fl">Subjects</label>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;" id="subject-tags">
+          <!-- Subject tags injected here -->
+          <button class="btn btn-ghost btn-sm" onclick="addSubjectPrompt()">＋ Add Subject</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs" style="margin-bottom: 20px;">
+      <button class="tab active" id="tab-entry" onclick="switchMode('entry')">✏ Entry Mode</button>
+      <button class="tab" id="tab-display" onclick="switchMode('display')">📊 Report View</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-circle" id="circle-avg-box" style="color:var(--accent)">
+          <svg>
+            <circle class="circle-bg" cx="24" cy="24" r="20"></circle>
+            <circle class="circle-val" id="circle-avg" cx="24" cy="24" r="20" stroke-dasharray="125.6"
+              stroke-dashoffset="125.6"></circle>
+          </svg>
+          <span class="stat-circle-num" id="s-avg-pct">0%</span>
+        </div>
+        <div><span class="stat-num" id="s-avg">0%</span>
+          <div class="stat-label">Class Avg</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-circle" id="circle-high-box" style="color:var(--green)">
+          <svg>
+            <circle class="circle-bg" cx="24" cy="24" r="20"></circle>
+            <circle class="circle-val" id="circle-high" cx="24" cy="24" r="20" stroke-dasharray="125.6"
+              stroke-dashoffset="125.6"></circle>
+          </svg>
+          <span class="stat-circle-num" id="s-high-pct">0%</span>
+        </div>
+        <div><span class="stat-num" id="s-high">0%</span>
+          <div class="stat-label">Highest</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-circle" id="circle-pass-box" style="color:var(--purple)">
+          <svg>
+            <circle class="circle-bg" cx="24" cy="24" r="20"></circle>
+            <circle class="circle-val" id="circle-pass" cx="24" cy="24" r="20" stroke-dasharray="125.6"
+              stroke-dashoffset="125.6"></circle>
+          </svg>
+          <span class="stat-circle-num" id="s-pass-pct">0%</span>
+        </div>
+        <div><span class="stat-num" id="s-pass">0</span>
+          <div class="stat-label">Pass Count</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-circle" id="circle-fail-box" style="color:var(--red)">
+          <svg>
+            <circle class="circle-bg" cx="24" cy="24" r="20"></circle>
+            <circle class="circle-val" id="circle-fail" cx="24" cy="24" r="20" stroke-dasharray="125.6"
+              stroke-dashoffset="125.6"></circle>
+          </svg>
+          <span class="stat-circle-num" id="s-fail-pct">0%</span>
+        </div>
+        <div><span class="stat-num" id="s-fail">0</span>
+          <div class="stat-label">Below 40%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toolbar" style="margin-bottom: 20px; display: flex; gap: 12px; align-items: center;">
+      <div class="search-wrap" style="flex: 1; max-width: 400px;">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Search by name or roll number..." oninput="renderTable()" />
+      </div>
+      <button class="btn btn-ghost" onclick="fillRemainingPrompt()">📥 Fill Empty Cells</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr id="thead-row">
+            <th>S.No</th>
+            <th>Short Code</th>
+            <th>Roll No</th>
+            <th>Name</th>
+            <!-- Dynamic subject columns -->
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
     </div>
   </div>
 
-  <!-- Config row -->
-  <div class="config-row" style="margin-bottom: 24px;">
-    <div class="field-group">
-      <label class="fl">Exam Type</label>
-      <div style="display:flex; gap:6px; align-items:center;">
-        <select class="sel" id="exam-type" onchange="updateConfig()">
-          <option>CIA 1</option><option>CIA 2</option><option>CIA 3</option>
-          <option>End Semester</option><option>Assignment</option>
-        </select>
-        <button class="btn btn-ghost btn-sm admin-only" id="add-exam-btn" onclick="addExamTypePrompt()" title="Add Exam Type" style="display: none; padding: 4px 8px; min-width: 32px; height: 32px; justify-content: center;">＋</button>
-        <button class="btn btn-ghost btn-sm admin-only" id="remove-exam-btn" onclick="removeExamTypePrompt()" title="Remove Current Exam Type" style="display: none; padding: 4px 8px; min-width: 32px; height: 32px; justify-content: center;">✕</button>
+  <!-- Notify Modal -->
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <div class="modal-hdr">
+        <span class="modal-ttl">Notify Parents — <span id="modal-exam">CIA 1</span></span>
+        <button class="modal-x" onclick="closeModal()">✕</button>
       </div>
-    </div>
-    <div class="field-group">
-      <label class="fl">Max Marks</label>
-      <input class="finput" id="max-marks" type="number" value="50" style="width:90px" onchange="recalcAll()"/>
-    </div>
-    <div class="divider-v" style="height: 32px; align-self: flex-end; margin: 0 10px;"></div>
-    <div class="field-group" style="flex:1">
-      <label class="fl">Subjects</label>
-      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;" id="subject-tags">
-        <!-- Subject tags injected here -->
-        <button class="btn btn-ghost btn-sm" onclick="addSubjectPrompt()">＋ Add Subject</button>
+      <div id="modal-list"></div>
+      <div class="modal-foot">
+        <button class="btn-wa-all" onclick="sendAll()">💬 Send All via WhatsApp</button>
       </div>
     </div>
   </div>
 
-  <div class="tabs" style="margin-bottom: 20px;">
-    <button class="tab active" id="tab-entry" onclick="switchMode('entry')">✏ Entry Mode</button>
-    <button class="tab" id="tab-display" onclick="switchMode('display')">📊 Report View</button>
+  <div class="toast" id="toast">
+    <div class="tdot"></div><span id="tmsg"></span>
   </div>
 
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat">
-      <div class="stat-circle" id="circle-avg-box" style="color:var(--accent)">
-        <svg><circle class="circle-bg" cx="24" cy="24" r="20"></circle><circle class="circle-val" id="circle-avg" cx="24" cy="24" r="20" stroke-dasharray="125.6" stroke-dashoffset="125.6"></circle></svg>
-        <span class="stat-circle-num" id="s-avg-pct">0%</span>
-      </div>
-      <div><span class="stat-num" id="s-avg">0%</span><div class="stat-label">Class Avg</div></div>
-    </div>
-    <div class="stat">
-      <div class="stat-circle" id="circle-high-box" style="color:var(--green)">
-        <svg><circle class="circle-bg" cx="24" cy="24" r="20"></circle><circle class="circle-val" id="circle-high" cx="24" cy="24" r="20" stroke-dasharray="125.6" stroke-dashoffset="125.6"></circle></svg>
-        <span class="stat-circle-num" id="s-high-pct">0%</span>
-      </div>
-      <div><span class="stat-num" id="s-high">0%</span><div class="stat-label">Highest</div></div>
-    </div>
-    <div class="stat">
-      <div class="stat-circle" id="circle-pass-box" style="color:var(--purple)">
-        <svg><circle class="circle-bg" cx="24" cy="24" r="20"></circle><circle class="circle-val" id="circle-pass" cx="24" cy="24" r="20" stroke-dasharray="125.6" stroke-dashoffset="125.6"></circle></svg>
-        <span class="stat-circle-num" id="s-pass-pct">0%</span>
-      </div>
-      <div><span class="stat-num" id="s-pass">0</span><div class="stat-label">Pass Count</div></div>
-    </div>
-    <div class="stat">
-      <div class="stat-circle" id="circle-fail-box" style="color:var(--red)">
-        <svg><circle class="circle-bg" cx="24" cy="24" r="20"></circle><circle class="circle-val" id="circle-fail" cx="24" cy="24" r="20" stroke-dasharray="125.6" stroke-dashoffset="125.6"></circle></svg>
-        <span class="stat-circle-num" id="s-fail-pct">0%</span>
-      </div>
-      <div><span class="stat-num" id="s-fail">0</span><div class="stat-label">Below 40%</div></div>
-    </div>
-  </div>
+  <script src="data.js"></script>
+  <script src="marks.js"></script>
+  <script src="theme.js"></script>
+</body>
 
-  <div class="toolbar" style="margin-bottom: 20px; display: flex; gap: 12px; align-items: center;">
-    <div class="search-wrap" style="flex: 1; max-width: 400px;">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="search-input" placeholder="Search by name or roll number..." oninput="renderTable()"/>
-    </div>
-    <button class="btn btn-ghost" onclick="fillRemainingPrompt()">📥 Fill Empty Cells</button>
-  </div>
-
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr id="thead-row">
-          <th>S.No</th><th>Short Code</th><th>Roll No</th><th>Name</th>
-          <!-- Dynamic subject columns -->
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- Notify Modal -->
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <div class="modal-hdr">
-      <span class="modal-ttl">Notify Parents — <span id="modal-exam">CIA 1</span></span>
-      <button class="modal-x" onclick="closeModal()">✕</button>
-    </div>
-    <div id="modal-list"></div>
-    <div class="modal-foot">
-      <button class="btn-wa-all" onclick="sendAll()">💬 Send All via WhatsApp</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"><div class="tdot"></div><span id="tmsg"></span></div>
-
-<script src="data.js"></script>
-<script src="marks.js"></script>
-<script src="theme.js"></script></body>
 </html>

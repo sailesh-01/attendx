@@ -1,73 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AttendX — WhatsApp Setup</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<link rel="icon" type="image/jpeg" href="ideogram.jpg"/>
-<link rel="stylesheet" href="styles.css"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AttendX — WhatsApp Setup</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="icon" type="image/jpeg" href="ideogram.jpg" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
-<nav>
-  <span class="nav-logo">AttendX</span>
-  <a class="nav-link" href="attendance.html">📋 Attendance</a>
-  <a class="nav-link" href="students.html">👥 Students</a>
+  <nav>
+    <span class="nav-logo">AttendX</span>
+    <a class="nav-link" href="attendance.html">📋 Attendance</a>
+    <a class="nav-link" href="students.html">👥 Students</a>
 
-  <a class="nav-link active" href="whatsapp.html">💬 WhatsApp</a>
-  <a class="nav-link nav-logout" href="index.html">🚪 Logout</a>
-</nav>
+    <a class="nav-link active" href="whatsapp.html">💬 WhatsApp</a>
+    <a class="nav-link nav-logout" href="index.html">🚪 Logout</a>
+  </nav>
 
-<div class="main">
-  <div class="page-header">
-    <div>
-      <div class="page-title">WhatsApp Setup</div>
-      <div class="page-sub"><span id="batch-badge">ES24AD</span> · Connect WhatsApp to enable parent notifications</div>
-    </div>
-  </div>
-
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('wa-web')">📱 Manual Web Link (Primary)</button>
-    <button class="tab" onclick="switchTab('n8n')">⚡ n8n Automation (Advanced)</button>
-  </div>
-
-  <!-- Panel 1: WA Web -->
-  <div class="panel active" id="panel-wa-web">
-    <div class="wa-card">
-      <div class="qr-box" id="qr-box">
-        <div class="qr-img">📱</div>
-        <div class="qr-label">Manual Status</div>
-        <div class="status-badge success" id="status-badge" style="margin-top:10px">Ready</div>
-      </div>
-      <div class="wa-steps">
-        <div class="status-pill sp-connected" id="status-pill">
-          <div class="pulse"></div>
-          <span id="status-text">Manual Mode Active — Using Personal Account</span>
-        </div>
-        <div style="margin-top:16px;font-size:12px;color:var(--muted)">
-          ℹ️ This method is 100% safe. It uses official WhatsApp <code style="font-family:var(--mono);color:var(--muted2)">wa.me</code> links.
+  <div class="main">
+    <div class="page-header">
+      <div>
+        <div class="page-title">WhatsApp Setup</div>
+        <div class="page-sub"><span id="batch-badge">ES24AD</span> · Connect WhatsApp to enable parent notifications
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Panel 2: n8n -->
-  <div class="panel" id="panel-n8n">
-    <div class="n8n-card" style="padding:24px;background:var(--card);border:1px solid var(--border);border-radius:12px">
-      <h3>n8n Automation (Optional)</h3>
-      <p style="font-size:14px;color:var(--muted);margin-bottom:20px">If you decide to self-host n8n later, enter your webhook URL here. The portal will send a JSON payload whenever you trigger a notification.</p>
-      
-      <div class="form-group" style="margin-bottom:20px">
-        <label class="fl">n8n Webhook URL</label>
-        <input class="finput" id="webhook-url" type="text" placeholder="https://your-n8n.com/webhook/attendance"/>
-      </div>
-      
-      <div style="display:flex;gap:10px">
-        <button class="btn btn-primary" onclick="testWebhook()">⚡ Test Connection</button>
-        <button class="btn btn-ghost" onclick="saveConfig()">💾 Save Config</button>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('wa-web')">📱 Manual Web Link (Primary)</button>
+      <button class="tab" onclick="switchTab('n8n')">⚡ n8n Automation (Advanced)</button>
+    </div>
+
+    <!-- Panel 1: WA Web -->
+    <div class="panel active" id="panel-wa-web">
+      <div class="wa-card">
+        <div class="qr-box" id="qr-box">
+          <div class="qr-img">📱</div>
+          <div class="qr-label">Manual Status</div>
+          <div class="status-badge success" id="status-badge" style="margin-top:10px">Ready</div>
+        </div>
+        <div class="wa-steps">
+          <div class="status-pill sp-connected" id="status-pill">
+            <div class="pulse"></div>
+            <span id="status-text">Manual Mode Active — Using Personal Account</span>
+          </div>
+          <div style="margin-top:16px;font-size:12px;color:var(--muted)">
+            ℹ️ This method is 100% safe. It uses official WhatsApp <code
+              style="font-family:var(--mono);color:var(--muted2)">wa.me</code> links.
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+
+    <!-- Panel 2: n8n -->
+    <div class="panel" id="panel-n8n">
+      <div class="n8n-card"
+        style="padding:24px;background:var(--card);border:1px solid var(--border);border-radius:12px">
+        <h3>n8n Automation (Optional)</h3>
+        <p style="font-size:14px;color:var(--muted);margin-bottom:20px">If you decide to self-host n8n later, enter your
+          webhook URL here. The portal will send a JSON payload whenever you trigger a notification.</p>
+
+        <div class="form-group" style="margin-bottom:20px">
+          <label class="fl">n8n Webhook URL</label>
+          <input class="finput" id="webhook-url" type="text" placeholder="https://your-n8n.com/webhook/attendance" />
+        </div>
+
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" onclick="testWebhook()">⚡ Test Connection</button>
+          <button class="btn btn-ghost" onclick="saveConfig()">💾 Save Config</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   </div>
@@ -98,11 +106,15 @@
       <button class="btn btn-ghost btn-sm" style="padding:7px 16px" onclick="previewTemplate()">Preview</button>
     </div>
   </div>
-</div>
+  </div>
 
-<div class="toast" id="toast"><div class="tdot" id="tdot"></div><span id="tmsg"></span></div>
+  <div class="toast" id="toast">
+    <div class="tdot" id="tdot"></div><span id="tmsg"></span>
+  </div>
 
-<script src="data.js"></script>
-<script src="whatsapp.js"></script>
-<script src="theme.js"></script></body>
+  <script src="data.js"></script>
+  <script src="whatsapp.js"></script>
+  <script src="theme.js"></script>
+</body>
+
 </html>

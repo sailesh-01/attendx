@@ -1,185 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Attendance Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<link rel="icon" type="image/jpeg" href="ideogram.jpg"/>
-<link rel="stylesheet" href="styles.css"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attendance Portal</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="icon" type="image/jpeg" href="ideogram.jpg" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
 
-<nav><span class="nav-logo">AttendX</span><a class="nav-link active" href="attendance.html">📋 Attendance</a><a class="nav-link" href="students.html">👥 Students</a><a class="nav-link" href="whatsapp.html">💬 WhatsApp</a><a class="nav-link nav-logout" href="index.html">🚪 Logout</a></nav>
-<div class="topbar">
-  <div class="topbar-left">
-    <span class="session-info" id="session-info-dynamic">
-      Dept: <span>AI &amp; DS</span> &nbsp;|&nbsp;
-      Year: <select class="sel" id="year-select" onchange="changeYear(this.value)" style="padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 5px;">
-        <option value="2">2nd Year</option>
-        <option value="3">3rd Year</option>
-        <option value="4">4th Year</option>
-      </select> &nbsp;|&nbsp;
-      Date: <span id="current-date-display"></span>
-    </span>
-  </div>
-  <div class="topbar-right">
-      <div class="badge badge-green"><div class="pulse" style="display:inline-block; margin-right:5px"></div>Live</div>
+  <nav><span class="nav-logo">AttendX</span><a class="nav-link active" href="attendance.html">📋 Attendance</a><a
+      class="nav-link" href="students.html">👥 Students</a><a class="nav-link" href="whatsapp.html">💬 WhatsApp</a><a
+      class="nav-link nav-logout" href="index.html">🚪 Logout</a></nav>
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="session-info" id="session-info-dynamic">
+        Dept: <span>AI &amp; DS</span> &nbsp;|&nbsp;
+        Year: <select class="sel" id="year-select" onchange="changeYear(this.value)"
+          style="padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 5px;">
+          <option value="2">2nd Year</option>
+          <option value="3">3rd Year</option>
+          <option value="4">4th Year</option>
+        </select> &nbsp;|&nbsp;
+        Date: <span id="current-date-display"></span>
+      </span>
     </div>
-</div>
-
-<div class="main">
-
-  <!-- Input section -->
-  <div class="input-section">
-    <div class="input-card" id="absent-card">
-      <div class="input-card-header">
-        <div class="input-icon icon-red">🚫</div>
-        <span class="input-label">Absent</span>
-      </div>
-      <textarea class="input-field" id="absent-input" rows="2"
-        placeholder="Ex: 101, 102"></textarea>
-      <div class="input-hint">Enter short codes separated by commas</div>
-    </div>
-
-    <div class="input-card" id="od-card">
-      <div class="input-card-header">
-        <div class="input-icon icon-amber">📋</div>
-        <span class="input-label">On Duty (OD)</span>
-      </div>
-      <textarea class="input-field" id="od-input" rows="2"
-        placeholder="Ex: 125, 130"></textarea>
-      <div class="input-hint">Students on official duty / event</div>
-    </div>
-  </div>
-
-  <!-- Action bar -->
-  <div class="action-bar">
-    <button class="btn btn-primary" onclick="applyAttendance()">
-      ⚡ Apply Attendance
-    </button>
-    <button class="btn btn-ghost" onclick="resetAll()">
-      ↺ Reset
-    </button>
-    <button class="btn btn-edit" onclick="markAllPresent()">
-      ✅ Mark All Present
-    </button>
-    <div class="search-wrap" style="margin-left: 12px; max-width: 280px;">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="search-input" placeholder="Search students..." oninput="renderTable()"/>
-    </div>
-    <button class="btn btn-ghost" onclick="openSummary()" style="margin-left: auto;">
-      📊 View Total
-    </button>
-    <a href="attendance_report.xlsx" download="attendance_report.xlsx" class="btn btn-excel" style="margin-left: 10px; text-decoration: none; display: inline-flex; align-items: center;">
-      <span>📥 Excel Report</span>
-    </a>
-    <button class="btn btn-notify" id="notify-btn" onclick="openModal()" disabled>
-      💬 Notifications
-    </button>
-  </div>
-
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat">
-      <div class="stat-circle" style="color:var(--accent)">
-        <svg><circle class="circle-bg" cx="24" cy="24" r="20"></circle><circle class="circle-val" id="circle-total" cx="24" cy="24" r="20" stroke-dasharray="125.6" stroke-dashoffset="0"></circle></svg>
-        <span class="stat-circle-num" id="stat-total-pct">100%</span>
-      </div>
-      <div>
-        <span class="stat-num num-total" id="stat-total">0</span>
-        <div class="stat-label">Total</div>
-      </div>
-    </div>
-    <div class="stat">
-      <div class="stat-circle" style="color:var(--green)">
-        <svg><circle class="circle-bg" cx="24" cy="24" r="20"></circle><circle class="circle-val" id="circle-present" cx="24" cy="24" r="20" stroke-dasharray="125.6" stroke-dashoffset="125.6"></circle></svg>
-        <span class="stat-circle-num" id="stat-present-pct">0%</span>
-      </div>
-      <div>
-        <span class="stat-num num-present" id="stat-present">0</span>
-        <div class="stat-label">Present</div>
-      </div>
-    </div>
-    <div class="stat">
-      <div class="stat-circle" style="color:var(--red)">
-        <svg><circle class="circle-bg" cx="24" cy="24" r="20"></circle><circle class="circle-val" id="circle-absent" cx="24" cy="24" r="20" stroke-dasharray="125.6" stroke-dashoffset="125.6"></circle></svg>
-        <span class="stat-circle-num" id="stat-absent-pct">0%</span>
-      </div>
-      <div>
-        <span class="stat-num num-absent" id="stat-absent">0</span>
-        <div class="stat-label">Absent</div>
-      </div>
-    </div>
-    <div class="stat">
-      <div class="stat-circle" style="color:var(--amber)">
-        <svg><circle class="circle-bg" cx="24" cy="24" r="20"></circle><circle class="circle-val" id="circle-od" cx="24" cy="24" r="20" stroke-dasharray="125.6" stroke-dashoffset="125.6"></circle></svg>
-        <span class="stat-circle-num" id="stat-od-pct">0%</span>
-      </div>
-      <div>
-        <span class="stat-num num-od" id="stat-od">0</span>
-        <div class="stat-label">On Duty</div>
+    <div class="topbar-right">
+      <div class="badge badge-green">
+        <div class="pulse" style="display:inline-block; margin-right:5px"></div>Live
       </div>
     </div>
   </div>
 
-  <!-- Table -->
-  <div class="table-wrap">
-    <table id="att-table">
-      <thead>
-        <tr>
-          <th>S.No</th>
-          <th>Short Code</th>
-          <th>Roll No</th>
-          <th>Name</th>
-          <th>Attendance</th>
-        </tr>
-      </thead>
-      <tbody id="att-body"></tbody>
-    </table>
-  </div>
+  <div class="main">
 
-</div>
+    <!-- Input section -->
+    <div class="input-section">
+      <div class="input-card" id="absent-card">
+        <div class="input-card-header">
+          <div class="input-icon icon-red">🚫</div>
+          <span class="input-label">Absent</span>
+        </div>
+        <textarea class="input-field" id="absent-input" rows="2" placeholder="Ex: 101, 102"></textarea>
+        <div class="input-hint">Enter short codes separated by commas</div>
+      </div>
 
-<!-- Notification Modal -->
-<div class="modal-overlay" id="modal">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title">Send Notifications</span>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="input-card" id="od-card">
+        <div class="input-card-header">
+          <div class="input-icon icon-amber">📋</div>
+          <span class="input-label">On Duty (OD)</span>
+        </div>
+        <textarea class="input-field" id="od-input" rows="2" placeholder="Ex: 125, 130"></textarea>
+        <div class="input-hint">Students on official duty / event</div>
+      </div>
     </div>
-    <div id="modal-list"></div>
-    <div class="modal-actions">
-      <button class="btn-wa-all" onclick="sendAll()">
-        💬 Send All via WhatsApp
+
+    <!-- Action bar -->
+    <div class="action-bar">
+      <button class="btn btn-primary" onclick="applyAttendance()">
+        ⚡ Apply Attendance
+      </button>
+      <button class="btn btn-ghost" onclick="resetAll()">
+        ↺ Reset
+      </button>
+      <button class="btn btn-edit" onclick="markAllPresent()">
+        ✅ Mark All Present
+      </button>
+      <div class="search-wrap" style="margin-left: 12px; max-width: 280px;">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Search students..." oninput="renderTable()" />
+      </div>
+      <button class="btn btn-ghost" onclick="openSummary()" style="margin-left: auto;">
+        📊 View Total
+      </button>
+      <a href="attendance_report.xlsx" download="attendance_report.xlsx" class="btn btn-excel"
+        style="margin-left: 10px; text-decoration: none; display: inline-flex; align-items: center;">
+        <span>📥 Excel Report</span>
+      </a>
+      <button class="btn btn-notify" id="notify-btn" onclick="openModal()" disabled>
+        💬 Notifications
       </button>
     </div>
-  </div>
-</div>
 
-<!-- Summary Modal -->
-<div class="modal-overlay" id="summary-modal">
-  <div class="modal" style="max-height: 85vh; display: flex; flex-direction: column;">
-    <div class="modal-header">
-      <span class="modal-title" id="summary-title">Total Attendance Summary</span>
-      <button class="modal-close" onclick="closeSummary()">✕</button>
-    </div>
-    <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
-      <button class="btn btn-ghost btn-sm" id="summary-back-btn" onclick="renderSummaryList()" style="display:none;">← Back</button>
-      <div class="search-wrap" style="flex:1; max-width:280px; margin-left:auto;">
-        <input type="text" id="summary-search" placeholder="Search short code (ex: 101)..." oninput="if(this.dataset.mode==='list') renderSummaryList()" onkeydown="if(event.key === 'Enter') { const c = document.getElementById('summary-content'); if(c && c.children.length === 1 && c.children[0].onclick) c.children[0].onclick(); }">
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-circle" style="color:var(--accent)">
+          <svg>
+            <circle class="circle-bg" cx="24" cy="24" r="20"></circle>
+            <circle class="circle-val" id="circle-total" cx="24" cy="24" r="20" stroke-dasharray="125.6"
+              stroke-dashoffset="0"></circle>
+          </svg>
+          <span class="stat-circle-num" id="stat-total-pct">100%</span>
+        </div>
+        <div>
+          <span class="stat-num num-total" id="stat-total">0</span>
+          <div class="stat-label">Total</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-circle" style="color:var(--green)">
+          <svg>
+            <circle class="circle-bg" cx="24" cy="24" r="20"></circle>
+            <circle class="circle-val" id="circle-present" cx="24" cy="24" r="20" stroke-dasharray="125.6"
+              stroke-dashoffset="125.6"></circle>
+          </svg>
+          <span class="stat-circle-num" id="stat-present-pct">0%</span>
+        </div>
+        <div>
+          <span class="stat-num num-present" id="stat-present">0</span>
+          <div class="stat-label">Present</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-circle" style="color:var(--red)">
+          <svg>
+            <circle class="circle-bg" cx="24" cy="24" r="20"></circle>
+            <circle class="circle-val" id="circle-absent" cx="24" cy="24" r="20" stroke-dasharray="125.6"
+              stroke-dashoffset="125.6"></circle>
+          </svg>
+          <span class="stat-circle-num" id="stat-absent-pct">0%</span>
+        </div>
+        <div>
+          <span class="stat-num num-absent" id="stat-absent">0</span>
+          <div class="stat-label">Absent</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-circle" style="color:var(--amber)">
+          <svg>
+            <circle class="circle-bg" cx="24" cy="24" r="20"></circle>
+            <circle class="circle-val" id="circle-od" cx="24" cy="24" r="20" stroke-dasharray="125.6"
+              stroke-dashoffset="125.6"></circle>
+          </svg>
+          <span class="stat-circle-num" id="stat-od-pct">0%</span>
+        </div>
+        <div>
+          <span class="stat-num num-od" id="stat-od">0</span>
+          <div class="stat-label">On Duty</div>
+        </div>
       </div>
     </div>
-    <div id="summary-content" style="overflow-y:auto; flex:1; padding-right:4px;"></div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table id="att-table">
+        <thead>
+          <tr>
+            <th>S.No</th>
+            <th>Short Code</th>
+            <th>Roll No</th>
+            <th>Name</th>
+            <th>Attendance</th>
+          </tr>
+        </thead>
+        <tbody id="att-body"></tbody>
+      </table>
+    </div>
+
   </div>
-</div>
 
-<div class="toast" id="toast">
-  <div class="toast-dot"></div>
-  <span id="toast-msg">Done!</span>
-</div>
+  <!-- Notification Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Send Notifications</span>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div id="modal-list"></div>
+      <div class="modal-actions">
+        <button class="btn-wa-all" onclick="sendAll()">
+          💬 Send All via WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
 
-<script src="data.js"></script>
-<script src="attendance.js"></script>
-<script src="theme.js"></script></body>
+  <!-- Summary Modal -->
+  <div class="modal-overlay" id="summary-modal">
+    <div class="modal" style="max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <span class="modal-title" id="summary-title">Total Attendance Summary</span>
+        <button class="modal-close" onclick="closeSummary()">✕</button>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
+        <button class="btn btn-ghost btn-sm" id="summary-back-btn" onclick="renderSummaryList()" style="display:none;">←
+          Back</button>
+        <div class="search-wrap" style="flex:1; max-width:280px; margin-left:auto;">
+          <input type="text" id="summary-search" placeholder="Search short code (ex: 101)..."
+            oninput="if(this.dataset.mode==='list') renderSummaryList()"
+            onkeydown="if(event.key === 'Enter') { const c = document.getElementById('summary-content'); if(c && c.children.length === 1 && c.children[0].onclick) c.children[0].onclick(); }">
+        </div>
+      </div>
+      <div id="summary-content" style="overflow-y:auto; flex:1; padding-right:4px;"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <div class="toast-dot"></div>
+    <span id="toast-msg">Done!</span>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="attendance.js"></script>
+  <script src="theme.js"></script>
+</body>
+
 </html>

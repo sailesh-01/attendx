@@ -1,196 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AttendX — Staff Management</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<link rel="icon" type="image/jpeg" href="ideogram.jpg"/>
-<link rel="stylesheet" href="styles.css"/>
-<style>
-  .admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
-  .staff-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: transform 0.2s, border-color 0.2s; position: relative; overflow: hidden; }
-  .staff-card:hover { transform: translateY(-2px); border-color: var(--accent); }
-  .staff-info h3 { margin: 0 0 5px 0; font-size: 18px; color: var(--text); }
-  .staff-info p { margin: 0; font-size: 13px; color: var(--muted); }
-  .staff-meta { display: flex; gap: 10px; margin-top: 15px; }
-  .meta-tag { background: var(--bg); border: 1px solid var(--border); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-family: var(--mono); color: var(--muted2); }
-  .card-actions { margin-top: 20px; display: flex; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 15px; }
-  .btn-delete { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: 0.2s; }
-  .btn-delete:hover { background: #ef4444; color: white; }
-  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
-  .empty-icon { font-size: 48px; margin-bottom: 15px; opacity: 0.5; }
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AttendX — Staff Management</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+    <link rel="icon" type="image/jpeg" href="ideogram.jpg" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .staff-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s, border-color 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .staff-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+
+        .staff-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 18px;
+            color: var(--text);
+        }
+
+        .staff-info p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .staff-meta {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .meta-tag {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-family: var(--mono);
+            color: var(--muted2);
+        }
+
+        .card-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+    </style>
 </head>
+
 <body>
 
-<nav>
-  <span class="nav-logo">AttendX</span>
-  <a class="nav-link" href="attendance.html">📋 Attendance</a>
-  <a class="nav-link" href="students.html">👥 Students</a>
+    <nav>
+        <span class="nav-logo">AttendX</span>
+        <a class="nav-link" href="attendance.html">📋 Attendance</a>
+        <a class="nav-link" href="students.html">👥 Students</a>
 
-  <a class="nav-link" href="whatsapp.html">💬 WhatsApp</a>
-  <a class="nav-link active" id="admin-nav" href="admin.html">🛡️ Admin</a>
-  <a class="nav-link nav-logout" href="index.html">🚪 Logout</a>
-</nav>
+        <a class="nav-link" href="whatsapp.html">💬 WhatsApp</a>
+        <a class="nav-link active" id="admin-nav" href="admin.html">🛡️ Admin</a>
+        <a class="nav-link nav-logout" href="index.html">🚪 Logout</a>
+    </nav>
 
-<div class="main">
-  <div class="page-header">
-    <div>
-      <div class="page-title">Staff Management</div>
-      <div class="page-sub">Admin Control Panel · Manage access for registered staff members</div>
-    </div>
-    <div class="header-actions">
-        <input type="text" id="staff-search" class="finput" style="width:220px" placeholder="Search by username..."/>
-        <button class="btn btn-primary" id="btn-add-staff">+ Add Staff</button>
-    </div>
-  </div>
-
-  <div id="staff-list" class="admin-grid">
-    <!-- Staff cards will be injected here -->
-    <div class="empty-state">
-        <div class="empty-icon">📂</div>
-        <p>Loading staff registry...</p>
-    </div>
-  </div>
-</div>
-
-
-<!-- Add Staff Modal -->
-<div class="modal-overlay" id="add-staff-modal">
-    <div class="modal-card">
-        <span class="close-modal" onclick="closeModal('add-staff-modal')">&times;</span>
-        <h2>Add New Staff</h2>
-        <div class="input-group">
-            <label>Username</label>
-            <input type="text" id="add-username" class="input-field" placeholder="e.g. john_doe">
-        </div>
-        <div class="input-group">
-            <label>Password</label>
-            <input type="password" id="add-password" class="input-field" placeholder="At least 6 chars">
-        </div>
-        <div class="input-group">
-            <label>Email Address</label>
-            <input type="email" id="add-email" class="input-field" placeholder="staff@college.edu">
-        </div>
-        <div class="form-grid">
-            <div class="form-group">
-                <label>Assign Year</label>
-                <select id="add-year" class="sel">
-                    <option value="1">1st Year</option>
-                    <option value="2">2nd Year</option>
-                    <option value="3">3rd Year</option>
-                    <option value="4">4th Year</option>
-                </select>
+    <div class="main">
+        <div class="page-header">
+            <div>
+                <div class="page-title">Staff Management</div>
+                <div class="page-sub">Admin Control Panel · Manage access for registered staff members</div>
             </div>
-            <div class="form-group">
-                <label>Assign Section</label>
-                <select id="add-section" class="sel">
-                    <option value="A">Section A</option>
-                    <option value="B">Section B</option>
-                    <option value="C">Section C</option>
-                </select>
+            <div class="header-actions">
+                <input type="text" id="staff-search" class="finput" style="width:220px"
+                    placeholder="Search by username..." />
+                <button class="btn btn-primary" id="btn-add-staff">+ Add Staff</button>
             </div>
         </div>
-        <div class="whatsapp-config" style="margin-top:20px; padding-top:15px; border-top:1px solid var(--border);">
-            <h3 style="font-size:14px; color:var(--accent); margin-bottom:15px;">💬 WhatsApp Configuration</h3>
+
+        <div id="staff-list" class="admin-grid">
+            <!-- Staff cards will be injected here -->
+            <div class="empty-state">
+                <div class="empty-icon">📂</div>
+                <p>Loading staff registry...</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Add Staff Modal -->
+    <div class="modal-overlay" id="add-staff-modal">
+        <div class="modal-card">
+            <span class="close-modal" onclick="closeModal('add-staff-modal')">&times;</span>
+            <h2>Add New Staff</h2>
             <div class="input-group">
-                <label>WhatsApp Token</label>
-                <input type="password" id="add-whatsapp-token" class="input-field" placeholder="Meta Graph API Token">
+                <label>Username</label>
+                <input type="text" id="add-username" class="input-field" placeholder="e.g. john_doe">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="add-password" class="input-field" placeholder="At least 6 chars">
+            </div>
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="add-email" class="input-field" placeholder="staff@college.edu">
             </div>
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Phone ID</label>
-                    <input type="text" id="add-whatsapp-phone-id" class="input-field" placeholder="15-digit ID">
+                    <label>Assign Year</label>
+                    <select id="add-year" class="sel">
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>Template Name</label>
-                    <input type="text" id="add-whatsapp-template" class="input-field" placeholder="e.g. attendance_alert">
+                    <label>Assign Section</label>
+                    <select id="add-section" class="sel">
+                        <option value="A">Section A</option>
+                        <option value="B">Section B</option>
+                        <option value="C">Section C</option>
+                    </select>
                 </div>
             </div>
-        </div>
-        <div id="add-error" class="error-msg" style="color:var(--red); font-size:12px; margin-top:10px; display:none;"></div>
+            <div class="whatsapp-config" style="margin-top:20px; padding-top:15px; border-top:1px solid var(--border);">
+                <h3 style="font-size:14px; color:var(--accent); margin-bottom:15px;">💬 WhatsApp Configuration</h3>
+                <div class="input-group">
+                    <label>WhatsApp Token</label>
+                    <input type="password" id="add-whatsapp-token" class="input-field"
+                        placeholder="Meta Graph API Token">
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Phone ID</label>
+                        <input type="text" id="add-whatsapp-phone-id" class="input-field" placeholder="15-digit ID">
+                    </div>
+                    <div class="form-group">
+                        <label>Template Name</label>
+                        <input type="text" id="add-whatsapp-template" class="input-field"
+                            placeholder="e.g. attendance_alert">
+                    </div>
+                </div>
+            </div>
+            <div id="add-error" class="error-msg"
+                style="color:var(--red); font-size:12px; margin-top:10px; display:none;"></div>
 
-        <div class="modal-footer">
-            <button class="btn btn-ghost" onclick="closeModal('add-staff-modal')">Cancel</button>
-            <button class="btn btn-primary" id="save-new-staff">Create Account</button>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('add-staff-modal')">Cancel</button>
+                <button class="btn btn-primary" id="save-new-staff">Create Account</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Edit Staff Modal -->
-<div class="modal-overlay" id="edit-staff-modal">
-    <div class="modal-card">
-        <span class="close-modal" onclick="closeModal('edit-staff-modal')">&times;</span>
-        <h2>Edit Staff Credentials</h2>
-        <input type="hidden" id="edit-id">
-        <div class="input-group">
-            <label>Username</label>
-            <input type="text" id="edit-username" class="input-field" placeholder="Username">
-        </div>
-        <div class="input-group">
-            <label>New Password (Optional)</label>
-            <input type="password" id="edit-password" class="input-field" placeholder="Leave blank to keep current">
-        </div>
-        <div class="input-group">
-            <label>Email Address</label>
-            <input type="email" id="edit-email" class="input-field" placeholder="staff@college.edu">
-        </div>
-        <div class="form-grid">
-            <div class="form-group">
-                <label>Assign Year</label>
-                <select id="edit-year" class="sel">
-                    <option value="1">1st Year</option>
-                    <option value="2">2nd Year</option>
-                    <option value="3">3rd Year</option>
-                    <option value="4">4th Year</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Assign Section</label>
-                <select id="edit-section" class="sel">
-                    <option value="A">Section A</option>
-                    <option value="B">Section B</option>
-                    <option value="C">Section C</option>
-                </select>
-            </div>
-        </div>
-        <div class="whatsapp-config" style="margin-top:20px; padding-top:15px; border-top:1px solid var(--border);">
-            <h3 style="font-size:14px; color:var(--accent); margin-bottom:15px;">💬 WhatsApp Configuration</h3>
+    <!-- Edit Staff Modal -->
+    <div class="modal-overlay" id="edit-staff-modal">
+        <div class="modal-card">
+            <span class="close-modal" onclick="closeModal('edit-staff-modal')">&times;</span>
+            <h2>Edit Staff Credentials</h2>
+            <input type="hidden" id="edit-id">
             <div class="input-group">
-                <label>WhatsApp Token</label>
-                <input type="password" id="edit-whatsapp-token" class="input-field" placeholder="Meta Graph API Token">
+                <label>Username</label>
+                <input type="text" id="edit-username" class="input-field" placeholder="Username">
+            </div>
+            <div class="input-group">
+                <label>New Password (Optional)</label>
+                <input type="password" id="edit-password" class="input-field" placeholder="Leave blank to keep current">
+            </div>
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="edit-email" class="input-field" placeholder="staff@college.edu">
             </div>
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Phone ID</label>
-                    <input type="text" id="edit-whatsapp-phone-id" class="input-field" placeholder="15-digit ID">
+                    <label>Assign Year</label>
+                    <select id="edit-year" class="sel">
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>Template Name</label>
-                    <input type="text" id="edit-whatsapp-template" class="input-field" placeholder="e.g. attendance_alert">
+                    <label>Assign Section</label>
+                    <select id="edit-section" class="sel">
+                        <option value="A">Section A</option>
+                        <option value="B">Section B</option>
+                        <option value="C">Section C</option>
+                    </select>
                 </div>
             </div>
-        </div>
-        <div id="edit-error" class="error-msg" style="color:var(--red); font-size:12px; margin-top:10px; display:none;"></div>
+            <div class="whatsapp-config" style="margin-top:20px; padding-top:15px; border-top:1px solid var(--border);">
+                <h3 style="font-size:14px; color:var(--accent); margin-bottom:15px;">💬 WhatsApp Configuration</h3>
+                <div class="input-group">
+                    <label>WhatsApp Token</label>
+                    <input type="password" id="edit-whatsapp-token" class="input-field"
+                        placeholder="Meta Graph API Token">
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Phone ID</label>
+                        <input type="text" id="edit-whatsapp-phone-id" class="input-field" placeholder="15-digit ID">
+                    </div>
+                    <div class="form-group">
+                        <label>Template Name</label>
+                        <input type="text" id="edit-whatsapp-template" class="input-field"
+                            placeholder="e.g. attendance_alert">
+                    </div>
+                </div>
+            </div>
+            <div id="edit-error" class="error-msg"
+                style="color:var(--red); font-size:12px; margin-top:10px; display:none;"></div>
 
-        <div class="modal-footer">
-            <button class="btn btn-ghost" onclick="closeModal('edit-staff-modal')">Cancel</button>
-            <button class="btn btn-primary" id="update-staff">Update Credentials</button>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('edit-staff-modal')">Cancel</button>
+                <button class="btn btn-primary" id="update-staff">Update Credentials</button>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="toast" id="toast"><div class="tdot" id="tdot"></div><span id="tmsg"></span></div>
+    <div class="toast" id="toast">
+        <div class="tdot" id="tdot"></div><span id="tmsg"></span>
+    </div>
 
-<script src="data.js"></script>
-<script src="admin.js"></script>
-<script>
-    // Security check: Only Admin can stay here
-    const loggedUser = localStorage.getItem("attendx_logged_staff");
-    if (loggedUser !== 'ADMIN') {
-        window.location.href = 'attendance.html';
-    }
-</script>
-<script src="theme.js"></script></body>
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+    <script>
+        // Security check: Only Admin can stay here
+        const loggedUser = localStorage.getItem("attendx_logged_staff");
+        if (loggedUser !== 'ADMIN') {
+            window.location.href = 'attendance.html';
+        }
+    </script>
+    <script src="theme.js"></script>
+</body>
+
 </html>
