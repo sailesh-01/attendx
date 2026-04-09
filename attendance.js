@@ -177,21 +177,21 @@ function renderTable() {
   const query = searchInput ? searchInput.value.toLowerCase() : "";
 
   tbody.innerHTML = "";
-  let p=0, a=0, od=0;
-
-  (window.students || []).forEach(s => {
-    const sc = String(s.short_code);
-    const st = attendance[sc] || "P";
-    if(st==="P") p++;
-    else if(st==="A") a++;
-    else if(st==="OD") od++;
-  });
 
   const filtered = (window.students || []).filter(s => {
     const sc = String(s.short_code);
     return s.name.toLowerCase().includes(query) || 
            sc.includes(query) ||
            rollNo(sc).toLowerCase().includes(query);
+  });
+
+  let p=0, a=0, od=0;
+  filtered.forEach(s => {
+    const sc = String(s.short_code);
+    const st = attendance[sc] || "P";
+    if(st==="P") p++;
+    else if(st==="A") a++;
+    else if(st==="OD") od++;
   });
 
   filtered.forEach(s => {
@@ -242,7 +242,7 @@ function renderTable() {
     tbody.appendChild(tr);
   });
 
-  const total = (window.students || []).length;
+  const total = filtered.length;
   
   // Animate stats
   const oldP = parseInt(document.getElementById("stat-present").textContent) || 0;
@@ -260,7 +260,7 @@ function renderTable() {
   updateCircle("absent", a, total);
   updateCircle("od", od, total);
 
-  document.getElementById("notify-btn").disabled = (a+od) === 0;
+  document.getElementById("notify-btn").disabled = (a+od) === 0 || query !== ""; // Only allow bulk notify when not searching to prevent accidents
 }
 
 
@@ -545,16 +545,6 @@ function showToast(msg) {
 document.addEventListener("DOMContentLoaded", () => {
   initAttendance();
 
-  const handleEnter = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      applyAttendance();
-    }
-  };
-
-  const oInp = document.getElementById("od-input");
-  if (aInp) aInp.addEventListener("keydown", handleEnter);
-  if (oInp) oInp.addEventListener("keydown", handleEnter);
 });
 
 let rawSummary = [];
