@@ -43,6 +43,9 @@ document.getElementById('login-form').addEventListener('submit', async function(
       setTimeout(() => {
         window.location.href = 'attendance.html';
       }, 800);
+    } else if (response.status === 503) {
+      // System Maintenance or Stop
+      showStatusModal(result.system_status, result.error);
     } else {
       // Error
       err.textContent = result.error || "Incorrect username or password.";
@@ -60,3 +63,23 @@ document.getElementById('login-form').addEventListener('submit', async function(
     err.style.opacity = '1';
   }
 });
+
+function showStatusModal(status, message) {
+    const modal = document.getElementById('status-modal');
+    const msgEl = document.getElementById('status-message');
+    const iconEl = document.getElementById('status-icon');
+    const titleEl = document.getElementById('status-title');
+    
+    if (!modal || !msgEl) return;
+    
+    msgEl.textContent = message;
+    if (status === 'Maintenance') {
+        iconEl.textContent = '🚧';
+        titleEl.textContent = 'Under Maintenance';
+    } else {
+        iconEl.textContent = '🛑';
+        titleEl.textContent = 'Server Stopped';
+    }
+    
+    modal.classList.add('show');
+}

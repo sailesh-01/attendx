@@ -53,6 +53,18 @@
 
 </div>
 
+<!-- Maintenance/Status Modal -->
+<div class="modal-overlay" id="status-modal">
+  <div class="modal" style="max-width: 380px; text-align: center; padding: 40px 30px;">
+    <div id="status-icon" style="font-size: 54px; margin-bottom: 20px;">🚧</div>
+    <h2 id="status-title" style="margin-bottom: 12px; font-size: 22px;">System Notice</h2>
+    <p id="status-message" style="color: var(--muted); margin-bottom: 30px; line-height: 1.6; font-size: 14px;"></p>
+    <button class="login-btn" onclick="document.getElementById('status-modal').classList.remove('show')" style="opacity: 1; transform: none; animation: none;">
+      Understand
+    </button>
+  </div>
+</div>
+
 <script src="login.js"></script>
 
 <script src="theme.js"></script></body>

@@ -10,6 +10,27 @@ const { createClient } = require('@supabase/supabase-js');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// System Status Management
+let systemStatus = 'Live';
+const statusFile = path.join(__dirname, 'status.json');
+
+function loadStatus() {
+    if (fs.existsSync(statusFile)) {
+        try {
+            const data = JSON.parse(fs.readFileSync(statusFile));
+            systemStatus = data.status || 'Live';
+        } catch (e) {
+            console.error("Error loading status:", e);
+        }
+    }
+}
+
+function saveStatus() {
+    fs.writeFileSync(statusFile, JSON.stringify({ status: systemStatus }));
+}
+
+loadStatus();
+
 // Initialize Supabase Client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -243,6 +264,16 @@ const ADMIN_HASH = '$2b$10$HI7jEuMrAuswWmmB6MVIqu7Rr6UO9XPaDtnL6oK4yJu23CQZ9abWS
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     
+    // Check system status FIRST for non-admin users
+    if (username !== 'ADMIN' && systemStatus !== 'Live') {
+        return res.status(503).json({ 
+            error: systemStatus === 'Maintenance' 
+                ? "on maintenance please login after some time" 
+                : "server is in stop",
+            system_status: systemStatus
+        });
+    }
+    
     if (username === 'ADMIN') {
         if (bcrypt.compareSync(password, ADMIN_HASH)) {
             return res.json({ 
@@ -390,6 +421,23 @@ app.delete('/api/admin/staff/:id', isAdmin, async (req, res) => {
 
     if (error) return res.status(500).json({ error: error.message });
     res.json({ success: true });
+});
+
+// System Status API
+app.get('/api/system-status', (req, res) => {
+    res.json({ status: systemStatus });
+});
+
+app.post('/api/system-status', isAdmin, (req, res) => {
+    const { status } = req.body;
+    if (['Live', 'Maintenance', 'Stop'].includes(status)) {
+        systemStatus = status;
+        saveStatus();
+        console.log(`System status changed to: ${status}`);
+        res.json({ success: true, status: systemStatus });
+    } else {
+        res.status(400).json({ error: "Invalid status" });
+    }
 });
 
 // WhatsApp API Status

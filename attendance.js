@@ -21,7 +21,91 @@ async function initAttendance() {
     });
 
     await loadData();
+    initSystemStatus();
 }
+
+async function initSystemStatus() {
+    const isAdmin = localStorage.getItem('attendx_logged_staff') === 'ADMIN';
+    const badge = document.getElementById('system-status-badge');
+    
+    if (!badge) return;
+
+    // Fetch initial status
+    let currentStatus = 'Live';
+    try {
+        const res = await fetch('/api/system-status');
+        const data = await res.json();
+        currentStatus = data.status || 'Live';
+        updateStatusUI(currentStatus);
+    } catch (e) {
+        console.error("Failed to fetch system status");
+    }
+
+    if (isAdmin) {
+        badge.classList.add('status-managed');
+        badge.title = "Click to change system status";
+        
+        const select = document.createElement('select');
+        select.className = 'status-select';
+        select.innerHTML = `
+            <option value="Live">Live</option>
+            <option value="Maintenance">On Maintenance</option>
+            <option value="Stop">Stop</option>
+        `;
+        select.value = currentStatus;
+        
+        select.onchange = async (e) => {
+            const newStatus = e.target.value;
+            await setSystemStatus(newStatus);
+        };
+        
+        badge.appendChild(select);
+    }
+}
+
+function updateStatusUI(status) {
+    const badge = document.getElementById('system-status-badge');
+    const text = document.getElementById('status-text');
+    const pulse = document.getElementById('status-pulse');
+    
+    if (!badge || !text) return;
+
+    text.textContent = status === 'Maintenance' ? 'On Maintenance' : status;
+    badge.className = 'badge'; // Reset
+    
+    if (status === 'Live') {
+        badge.classList.add('badge-green');
+        if (pulse) pulse.style.display = 'inline-block';
+    } else if (status === 'Maintenance') {
+        badge.classList.add('badge-amber');
+        if (pulse) pulse.style.display = 'none';
+    } else if (status === 'Stop') {
+        badge.classList.add('badge-red');
+        if (pulse) pulse.style.display = 'none';
+    }
+}
+
+async function setSystemStatus(status) {
+    try {
+        const res = await fetch('/api/system-status', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'x-admin-user': 'ADMIN'
+            },
+            body: JSON.stringify({ status, adminUser: 'ADMIN' })
+        });
+        if (res.ok) {
+            updateStatusUI(status);
+            showToast(`System status updated to ${status}`);
+        } else {
+            showToast("Failed to update status");
+        }
+    } catch (e) {
+        showToast("Error updating status");
+    }
+}
+
 
 async function loadData() {
     showToast("Loading students...");
