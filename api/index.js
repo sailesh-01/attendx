@@ -12,7 +12,7 @@ const port = process.env.PORT || 3000;
 
 // System Status Management
 let systemStatus = 'Live';
-const statusFile = path.join(__dirname, 'status.json');
+const statusFile = path.join(process.cwd(), 'status.json');
 
 function loadStatus() {
     if (fs.existsSync(statusFile)) {
@@ -38,7 +38,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname)); // Serve frontend files
+app.use(express.static(process.cwd())); // Serve frontend files from root
 
 // Request Logging
 app.use((req, res, next) => {
@@ -561,7 +561,7 @@ async function exportAttendanceToExcel() {
         });
 
         worksheet.autoFilter = 'A1:K1';
-        const filePath = path.join(__dirname, 'attendance_report.xlsx');
+        const filePath = path.join(process.cwd(), 'attendance_report.xlsx');
         await workbook.xlsx.writeFile(filePath);
         console.log(`Excel Sync: Updated ${rows.length} records`);
     } catch (e) {
