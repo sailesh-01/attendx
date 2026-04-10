@@ -10,6 +10,7 @@ const { createClient } = require('@supabase/supabase-js');
 const app = express();
 const port = process.env.PORT || 3000;
 const root = path.join(__dirname, '..');
+const publicPath = path.join(root, 'public');
 
 // System Status Management
 let systemStatus = 'Live';
@@ -39,8 +40,8 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(root)); // Serve frontend files from root
-app.get('/', (req, res) => res.sendFile(path.join(root, 'index.html'))); // Explicit root handler
+app.use(express.static(publicPath)); // Serve frontend files from public/
+app.get('/', (req, res) => res.sendFile(path.join(publicPath, 'index.html'))); // Explicit root handler
 
 // Request Logging
 app.use((req, res, next) => {
