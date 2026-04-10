@@ -9,10 +9,11 @@ const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 const port = process.env.PORT || 3000;
+const root = path.join(__dirname, '..');
 
 // System Status Management
 let systemStatus = 'Live';
-const statusFile = path.join(process.cwd(), 'status.json');
+const statusFile = path.join(root, 'status.json');
 
 function loadStatus() {
     if (fs.existsSync(statusFile)) {
@@ -38,7 +39,8 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(process.cwd())); // Serve frontend files from root
+app.use(express.static(root)); // Serve frontend files from root
+app.get('/', (req, res) => res.sendFile(path.join(root, 'index.html'))); // Explicit root handler
 
 // Request Logging
 app.use((req, res, next) => {
@@ -561,7 +563,7 @@ async function exportAttendanceToExcel() {
         });
 
         worksheet.autoFilter = 'A1:K1';
-        const filePath = path.join(process.cwd(), 'attendance_report.xlsx');
+        const filePath = path.join(root, 'attendance_report.xlsx');
         await workbook.xlsx.writeFile(filePath);
         console.log(`Excel Sync: Updated ${rows.length} records`);
     } catch (e) {
